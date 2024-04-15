@@ -3,14 +3,14 @@
 ## INSTALACIÓN
 Se debe instalar python, para evitar posibles incompatibilidades, esta api se desarrolló con Python 3.11.3
 ### Creación Entontorno Virutal Python
-Generalmente se recomienda trabajar con 'virtual environments' en python, **AFUERA DE LA CARPETA CONTENEDORA DEL PROYECTO**
+Generalmente se recomienda trabajar con 'virtual environments' en python, **AFUERA DE LA CARPETA CONTENEDORA DEL PROYECTO**, para crearlo ejecutar:
 
 ```
     python -m venv "nombre_del_entorno_virutal"
 ```
 Una vez creado, activar el entorno virtual (si se encuentra en la misma dirección de la carpeta del entorno)
 ```
-    .\venv\Scripts\activate
+    .\nombre_del_entorno_virutal\Scripts\activate
 ```
 Instalar los paquetes necesarios con el archivo requirements.txt
 

@@ -6,11 +6,11 @@ Se debe instalar python, para evitar posibles incompatibilidades, esta api se de
 Generalmente se recomienda trabajar con 'virtual environments' en python, **AFUERA DE LA CARPETA CONTENEDORA DEL PROYECTO**, para crearlo ejecutar:
 
 ```
-    python -m venv "nombre_del_entorno_virutal"
+    python -m venv "nombre_del_entorno_virtual"
 ```
 Una vez creado, activar el entorno virtual (si se encuentra en la misma dirección de la carpeta del entorno)
 ```
-    .\nombre_del_entorno_virutal\Scripts\activate
+    .\nombre_del_entorno_virtual\Scripts\activate
 ```
 Instalar los paquetes necesarios con el archivo requirements.txt
 

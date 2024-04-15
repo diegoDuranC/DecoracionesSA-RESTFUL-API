@@ -2,7 +2,7 @@
 
 ## INSTALACIÓN
 Se debe instalar python, para evitar posibles incompatibilidades, esta api se desarrolló con Python 3.11.3
-### Creación Entontorno Virutal Python
+### Creación Entontorno Virtual Python
 Generalmente se recomienda trabajar con 'virtual environments' en python, **AFUERA DE LA CARPETA CONTENEDORA DEL PROYECTO**, para crearlo ejecutar:
 
 ```

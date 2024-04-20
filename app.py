@@ -2,6 +2,7 @@ from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_marshmallow import Marshmallow
 from config.config import Config
+from flask_cors import CORS
 
 db = SQLAlchemy()
 ma = Marshmallow()
@@ -12,6 +13,7 @@ def create_app():
 
     ma.init_app(app)
     db.init_app(app)
+    CORS(app)
 
     with app.app_context():
         # Importing routes here avoids a circular reference

@@ -1,6 +1,7 @@
 from flask import Blueprint, jsonify
 from controllers.cliente_controller import ClienteController
 from models.cliente import ClienteSchema
+from flask_cors import cross_origin
 
 cliente_bp = Blueprint('cliente', __name__)
 cliente_controller = ClienteController()
@@ -9,6 +10,7 @@ cliente_schema = ClienteSchema()
 clientes_schema = ClienteSchema(many=True)
 
 #Crear Cliente
+@cross_origin()
 @cliente_bp.route("/cliente", methods=['POST'])
 def create():
     result = cliente_controller.create_cliente()
@@ -22,6 +24,7 @@ def create():
 #     return materials_schema.jsonify(results)
 
 #OBTENER CLIENTE
+@cross_origin()
 @cliente_bp.route("/cliente/<string:ci_cliente>", methods=['GET'])
 def obtener_material(ci_cliente):
     result = cliente_controller.get_cliente(ci_cliente)
@@ -32,6 +35,7 @@ def obtener_material(ci_cliente):
     return cliente_schema.jsonify(result)
 
 #OBTENER CLIENTES
+@cross_origin()
 @cliente_bp.route("/clientes", methods=['GET'])
 def obtener_materiales():
     results = cliente_controller.get_clientes()
@@ -40,6 +44,7 @@ def obtener_materiales():
     return clientes_schema.jsonify(results)
 
 # #ACTUALIZAR PARCIALMENTE "PUT"
+@cross_origin()
 @cliente_bp.route("/cliente/<int:id_cliente>", methods=['PUT'])
 def actualizar_campos(id_cliente):
     updated_cliente = cliente_controller.update_cliente(id_cliente)
@@ -50,6 +55,7 @@ def actualizar_campos(id_cliente):
     return cliente_schema.jsonify(updated_cliente)
 
 #ELIMINAR
+@cross_origin()
 @cliente_bp.route("/cliente/<int:id_cliente>", methods=['DELETE'])
 def eliminar_material(id_cliente):
     deleted_cliente = cliente_controller.delete_cliente(id_cliente)

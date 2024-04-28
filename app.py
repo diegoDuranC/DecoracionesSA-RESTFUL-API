@@ -22,6 +22,7 @@ def create_app():
         from routes.empleado_routes import empleado_bp
         from routes.area_routes import area_bp
         from routes.cargo_routes import cargo_bp
+        from routes.banco_routes import banco_bp
 
         db.create_all()
 
@@ -30,5 +31,6 @@ def create_app():
         app.register_blueprint(empleado_bp)
         app.register_blueprint(area_bp)
         app.register_blueprint(cargo_bp)
+        app.register_blueprint(banco_bp)
 
     return app

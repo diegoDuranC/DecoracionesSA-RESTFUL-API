@@ -3,7 +3,7 @@ from app import db, ma
 class Banco(db.Model):
     __tablename__ = "bancos"
 
-    nro_banco = db.Column(db.Integer, primary_key=True, auto_increment=True)
+    nro_banco = db.Column(db.Integer, primary_key=True, autoincrement=True)
     nombre = db.Column(db.String(80), nullable=False)
     direccion = db.Column(db.String(255), nullable=False)
     ciudad = db.Column(db.String(30), nullable=False)

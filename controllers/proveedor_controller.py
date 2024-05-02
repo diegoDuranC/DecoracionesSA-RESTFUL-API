@@ -25,12 +25,6 @@ class ProveedorController():
         return proveedor
 
     def update_proveedor(self, id):
-        '''
-            "nombre": "Juan Carlos Beltrán Caicedo",
-            "telefono": "77124234",
-            "empresa" : "Barraca San Julian",
-            "direccion": "Av Santos Dumont 5to Anillo"
-        '''
         proveedor = Proveedor.query.get(id)
 
         if proveedor is None:

@@ -24,6 +24,7 @@ def create_app():
         from routes.cargo_routes import cargo_bp
         from routes.banco_routes import banco_bp
         from routes.proveedor_routes import proveedor_bp
+        from routes.proyecto_routes import proyecto_bp
 
         db.create_all()
 
@@ -34,5 +35,6 @@ def create_app():
         app.register_blueprint(cargo_bp)
         app.register_blueprint(banco_bp)
         app.register_blueprint(proveedor_bp)
+        app.register_blueprint(proyecto_bp)
 
     return app

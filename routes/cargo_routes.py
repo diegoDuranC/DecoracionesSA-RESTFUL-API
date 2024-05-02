@@ -28,7 +28,7 @@ def obtener_cargo(codigo_cargo):
 
 #OBTENER CARGOS
 @cross_origin()
-@cargo_bp.route("/cargo", methods=['GET'])
+@cargo_bp.route("/cargos", methods=['GET'])
 def obtener_cargos():
     results = cargo_controller.get_cargos()
     cargo_schema.dump(results)

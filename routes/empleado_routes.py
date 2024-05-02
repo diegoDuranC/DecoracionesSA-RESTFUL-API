@@ -37,7 +37,7 @@ def obtener_empleado(id_empleado):
     return empleado_schema.jsonify(result)
 
 @cross_origin()
-@empleado_bp.route("/empleado", methods=['GET'])
+@empleado_bp.route("/empleados", methods=['GET'])
 def obtener_empleados():
     results = empleado_controller.get_empleados()
     empleado_schemas.dump(results)

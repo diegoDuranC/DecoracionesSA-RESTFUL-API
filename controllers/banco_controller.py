@@ -17,6 +17,9 @@ class BancoController():
     
     def get_banco(self, id):
         banco = Banco.query.get(id)
+        
+        if banco is None: return None
+
         return banco
     
     def update_banco(self, id):

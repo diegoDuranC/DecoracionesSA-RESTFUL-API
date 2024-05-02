@@ -1,5 +1,4 @@
 from flask import Blueprint, jsonify
-from app import ma
 from flask_cors import cross_origin
 
 from controllers.proyecto_controller import ProyectoController

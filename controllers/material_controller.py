@@ -44,8 +44,7 @@ class MaterialController():
         
         if 'descripcion' in request.json:
             material.descripcion = request.json['descripcion']
-        if 'precio_unitario' in request.json:
-            material.precio_unitario = request.json['precio_unitario']
+            
         if 'existencias' in request.json:
             material.existencias = request.json['existencias']
 

@@ -1,4 +1,4 @@
-from models.empleado import Empleado
+from models.rrhh.empleado import Empleado
 from app import db
 from flask import request
 
@@ -31,18 +31,15 @@ class EmpleadoController():
         if 'telefono_empleado' in request.json:
             empleado.telefono_empleado = request.json['telefono_empleado']
 
-        if 'cargo' in request.json:
-            empleado.cargo = request.json['cargo'] 
+        if 'cargo_id' in request.json:
+            empleado.cargo = request.json['cargo_id'] 
         
-        if 'area' in request.json:
-            empleado.area = request.json['area']
+        if 'area_id' in request.json:
+            empleado.area = request.json['area_id']
         
         if 'jefe_id' in request.json:
             empleado.jefe_id = request.json['jefe_id']
         
-        if 'estado' in request.json:
-            empleado.estado = request.json['estado'].upper()
-
         if 'fecha_contratacion' in request.json:
             empleado.fecha_contracion = request.json['fecha_contracion']
         

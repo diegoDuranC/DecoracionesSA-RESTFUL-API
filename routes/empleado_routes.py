@@ -1,6 +1,6 @@
 from flask import Blueprint, jsonify
 from controllers.empleado_controller import EmpleadoController
-from models.empleado import EmpleadoSchema
+from models.rrhh.empleado import EmpleadoSchema
 from flask_cors import cross_origin
 
 empleado_bp = Blueprint('empleado', __name__)

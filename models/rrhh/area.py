@@ -5,10 +5,11 @@ class Area(db.Model):
 
     id_area = db.Column(db.Integer, primary_key=True, autoincrement=True)
     area = db.Column(db.String(50), nullable=False, unique=True)
+    empleado = db.relationship('Empleado', back_populates='area', uselist=False)
 
     def __init__(self, area):
         self.area = area
 
 class AreaSchema(ma.Schema):
     class Meta:
-        fields = ('id_area', 'area')
+        fields = ('id_area', 'area', 'empleados')

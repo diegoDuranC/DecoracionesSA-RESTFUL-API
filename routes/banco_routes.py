@@ -1,6 +1,6 @@
 from flask import Blueprint, jsonify
 from controllers.banco_controller import BancoController
-from models.banco import BancoSchema
+from models.banco.banco import BancoSchema
 from flask_cors import cross_origin
 
 banco_bp = Blueprint('banco', __name__)

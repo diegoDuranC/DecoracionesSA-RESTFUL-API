@@ -5,6 +5,7 @@ class Cargo(db.Model):
 
     id_cargo = db.Column(db.Integer, primary_key=True, autoincrement=True)
     cargo = db.Column(db.String(50), nullable=False, unique=True)
+    empleado = db.relationship('Empleado', back_populates='cargo', uselist=False)
 
     def __init__(self, cargo):
         self.cargo = cargo

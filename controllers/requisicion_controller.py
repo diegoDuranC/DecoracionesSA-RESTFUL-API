@@ -1,6 +1,6 @@
 from app import db
 from flask import request
-from models.requisicion import Requisicion
+from models.requisicion.requisicion import Requisicion
 
 class RequisicionController():
 
@@ -31,7 +31,8 @@ class RequisicionController():
         if 'fecha_entrega_requerida' in request.json : requisicion.fecha_entrega_requerida = request.json['fecha_entrega_requerida']
         if 'descripcion' in request.json : requisicion.descripcion = request.json['descripcion']
         if 'estado' in request.json : requisicion.estado = request.json['estado']
-        if 'proyecto' in request.json : requisicion.proyecto = request.json['proyecto']
+        if 'proyecto_id' in request.json : requisicion.proyecto = request.json['proyecto_id']
+        if 'costo' in request.json: requisicion.costo = request.json['costo']
 
         db.session.commit()
 

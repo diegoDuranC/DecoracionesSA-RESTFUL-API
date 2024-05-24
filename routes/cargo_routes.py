@@ -1,6 +1,6 @@
 from flask import Blueprint, jsonify
 from controllers.cargo_controller import CargoController
-from models.cargo import CargoSchema
+from models.rrhh.cargo import CargoSchema
 from flask_cors import cross_origin
 
 cargo_bp = Blueprint('cargo', __name__)

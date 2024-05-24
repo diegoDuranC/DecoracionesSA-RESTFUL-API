@@ -46,9 +46,9 @@ def actualizar_proyecto(id_proyecto):
     return proyecto_schema.jsonify(updated_proyecto)
 
 @cross_origin
-@proyecto_bp.route("/proyecto/<int:id_proyecto>", methods=['DELETE'])
-def eliminar_proyecto(id_proyecto):
-    deleted_proyecto = proyecto_controller.delete_proyecto(id_proyecto)
+@proyecto_bp.route("/proyecto/<int:nro_proyecto>", methods=['DELETE'])
+def eliminar_proyecto(nro_proyecto):
+    deleted_proyecto = proyecto_controller.delete_proyecto(nro_proyecto)
 
     if deleted_proyecto is None:
         return jsonify({'error': 'Proyecto no encontrado'})

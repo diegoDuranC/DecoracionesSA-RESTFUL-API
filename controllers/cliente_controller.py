@@ -1,4 +1,4 @@
-from models.cliente import Cliente
+from models.cliente.cliente import Cliente
 from app import db
 from flask import request
 
@@ -12,15 +12,20 @@ class ClienteController():
 
         return cliente
     
-    def get_cliente(self, ci_cliente):
-        cliente = Cliente.query.get(ci_cliente)
+    def get_cliente_ci(self, ci_cliente):
+        #cliente = Cliente.query.get(ci_cliente)
+        cliente = Cliente.query.filter_by(ci_cliente=ci_cliente).first()
+        return cliente
+    
+    def get_cliente_id(self, id_cliente):
+        cliente = Cliente.query.get(id_cliente)
         return cliente
     
     def get_clientes(self):
         return Cliente.query.all()
     
-    def update_cliente(self, cliente_ci):
-        cliente = Cliente.query.get(cliente_ci)
+    def update_cliente(self, id_cliente):
+        cliente = Cliente.query.get(id_cliente)
 
         if cliente is None:
             return None #Manejar un error de que no existe dicho objeto en la BD

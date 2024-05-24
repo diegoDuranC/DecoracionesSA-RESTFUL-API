@@ -3,10 +3,12 @@ from app import db, ma
 class Banco(db.Model):
     __tablename__ = "bancos"
 
-    nro_banco = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    id_banco = db.Column(db.Integer, primary_key=True, autoincrement=True)
     nombre = db.Column(db.String(80), nullable=False)
     direccion = db.Column(db.String(255), nullable=False)
     ciudad = db.Column(db.String(30), nullable=False)
+
+    depositos = db.relationship('Deposito', back_populates='banco')
 
     def __init__(self, nombre, direccion, ciudad):
         self.nombre = nombre
@@ -18,4 +20,4 @@ class Banco(db.Model):
     
 class BancoSchema(ma.Schema):
     class Meta:
-        fields = ('nro_banco', 'nombre', 'direccion', 'ciudad')
+        fields = ('id_banco', 'nombre', 'direccion', 'ciudad')

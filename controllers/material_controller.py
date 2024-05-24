@@ -1,4 +1,4 @@
-from models.material import Material
+from models.material.material import Material
 from app import db
 from flask import request
 
@@ -34,7 +34,7 @@ class MaterialController():
         return material
 
     def get_materiales(self):
-        return Material.query.all()
+        return db.session.query(Material).all()
 
     def update_material(self, material_id):
         material = Material.query.get(material_id)

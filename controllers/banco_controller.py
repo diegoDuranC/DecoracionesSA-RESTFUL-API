@@ -1,4 +1,4 @@
-from models.banco import Banco
+from models.banco.banco import Banco
 from app import db
 from flask import request
 

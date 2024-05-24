@@ -31,7 +31,7 @@ def obtener_proveedor(nro_proveedor):
     result = proveedor_controller.get_proveedor(nro_proveedor)
     
     if not result:
-        return jsonify({'error': 'Proveedor no encontrado'}), 404
+        return jsonify({'error': 'Proveedor no encontrado'})
     
     return proveedor_schema.jsonify(result)
 

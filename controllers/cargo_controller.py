@@ -1,4 +1,4 @@
-from models.cargo import Cargo
+from models.rrhh.cargo import Cargo
 from app import db
 from flask import request
 

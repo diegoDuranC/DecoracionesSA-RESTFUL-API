@@ -10,6 +10,10 @@ class Cliente(db.Model):
     direccion_cliente = db.Column(db.String(255), nullable=False)
     telefono_cliente = db.Column(db.String(8), nullable=False)
 
+    proyectos = db.relationship('Proyecto', back_populates='cliente')
+    facturas = db.relationship('FacturaCliente', back_populates='cliente')
+    cuentas_por_cobrar = db.relationship('CuentaPorCobrar', back_populates='cliente')
+
     def __init__(self, ci_cliente, nombre_cliente, apellido_cliente, direccion_cliente, telefono_cliente):
         self.ci_cliente = ci_cliente
         self.nombre_cliente = nombre_cliente
@@ -23,3 +27,8 @@ class Cliente(db.Model):
 class ClienteSchema(ma.Schema):
     class Meta:
         fields = ('id_cliente', 'ci_cliente', 'nombre_cliente', 'apellido_cliente', 'direccion_cliente', 'telefono_cliente')
+
+class ClienteFacturaSchema(ma.Schema):
+    
+    class Meta:
+        fields = ('nombre_cliente', 'apellido_cliente', 'numero_cliente')

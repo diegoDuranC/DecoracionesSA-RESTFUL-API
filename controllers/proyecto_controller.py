@@ -33,6 +33,8 @@ class ProyectoController():
         if 'numero_proyecto' in request.json: proyecto.numero_proyecto = request.json['numero_proyecto']
         if 'nombre_proyecto' in request.json: proyecto.nombre_proyecto = request.json['nombre_proyecto']
         if 'descripcion_proyecto' in request.json: proyecto.descripcion_proyecto = request.json['descripcion_proyecto']
+        if 'cliente_id' in request.json: proyecto.cliente_id = request.json['cliente_id']
+        if 'encargado_proyecto' in request.json: proyecto.encargado_proyecto = request.json['encargado_proyecto']
 
         db.session.commit()
 

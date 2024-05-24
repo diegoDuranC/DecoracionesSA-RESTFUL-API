@@ -1,13 +1,27 @@
 from flask import Blueprint, jsonify
 from controllers.material_controller import MaterialController
-from models.material import MaterialSchema
+from models.material.material import MaterialSchema
 from flask_cors import cross_origin
+
+#DETALLE_MATERIALES
+from models.requisicion.detalle_materiales import DetalleMaterialSolicitadoSchema
+from controllers.detalle_materiales_controller import DetalleMaterialesController
 
 material_bp = Blueprint('material', __name__)
 material_controller = MaterialController()
 
 material_schema = MaterialSchema()
 materials_schema = MaterialSchema(many = True)
+
+detalle_controller = DetalleMaterialesController()
+
+detalle_material_schema = DetalleMaterialSolicitadoSchema()
+detalle_material_schemas = DetalleMaterialSolicitadoSchema(many=True)
+
+@cross_origin()
+@material_bp.route("/")
+def inicio():
+    return "INICIO"
 
 #CREAR MATERIAL
 @cross_origin()
@@ -64,3 +78,28 @@ def eliminar_material(codigo_material):
         return jsonify({'error': 'Material not found or update failed'}), 404
     
     return material_schema.jsonify(deleted_material)
+
+#DETALLE
+@cross_origin()
+@material_bp.route("/material/detalle_material", methods=['GET'])
+def get_detalles():
+    result = detalle_controller.get_detalles()
+    result = detalle_material_schemas.dump(result)
+    return jsonify(result)
+
+@cross_origin()
+@material_bp.route("/material/detalle_material/<int:nro_requisicion>", methods=['GET'])
+def get_detalles_requisicion(nro_requisicion):
+    result = detalle_controller.get_detalles_requisicion(nro_requisicion)
+    result = detalle_material_schemas.dump(result)
+    return jsonify(result)
+
+@cross_origin()
+@material_bp.route("/material/detalle_material/<int:nro_requisicion>/<int:id_detalle>/<int:cod_material>", methods=['PUT'])
+def actualizar_campos_detalle(id_detalle, nro_requisicion, cod_material):
+    updated = detalle_controller.actualizar_detalle(id_detalle, nro_requisicion, cod_material)
+
+    if updated is None:
+        return jsonify({'error': 'No se pudo actualizar el detalle'})
+    
+    return detalle_material_schema.dump(updated)

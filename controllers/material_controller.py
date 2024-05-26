@@ -13,22 +13,6 @@ class MaterialController():
 
         return material
     
-    # def create_materiales(self):
-    #     materiales = request.json()
-
-    #     for material in materiales:
-
-    #         descripcion = material['descripcion']
-    #         precio_unitario = material['precio_unitario']
-    #         existencias = material['existencias']
-
-    #         new_material = Material(descripcion, precio_unitario, existencias)
-    #         db.session.add(new_material)
-        
-    #     db.session.commit()
-
-    #     return materiales
-    
     def get_material(self, material_id):
         material = Material.query.get(material_id)
         return material

@@ -1,9 +1,9 @@
 from models.requisicion.requisicion import Requisicion, RequisicionSchema
 from models.requisicion.detalle_materiales import DetalleMaterialRequisicion
 from models.material.material import Material
+from models.material.transacciones_inventario import TransaccionInventario
 from models.proyecto import Proyecto
 from sqlalchemy.exc import IntegrityError
-
 
 from app import db
 from flask import jsonify
@@ -12,14 +12,14 @@ class RequisicionFacade():
     
     def crear_requisicion(self, request_data):
         try:
-            #Datos para requisicion - ENCABEZADO
+            # Datos para requisicion - ENCABEZADO
             fecha_entrega_requerida = request_data.get('fecha_entrega_requerida')
             descripcion = request_data.get('descripcion')
             costo = request_data.get('costo')
             proyecto_id = request_data.get('proyecto_id')
             materiales = request_data.get('materiales')
 
-            #CREAR LA REQUISICION
+            # CREAR LA REQUISICION
             requisicion = Requisicion(
                 fecha_entrega_requerida=fecha_entrega_requerida,
                 descripcion=descripcion,
@@ -36,7 +36,7 @@ class RequisicionFacade():
                 codigo_material = item.get('codigo_material')
                 cantidad_solicitada = item.get('cantidad_solicitada')
 
-                #VERIFICAR EXISTENCIAS
+                # VERIFICAR EXISTENCIAS
 
                 material = Material.query.get(codigo_material)
 
@@ -53,8 +53,26 @@ class RequisicionFacade():
                 )
                 db.session.add(detalle_material)
 
-            db.session.commit()
+                # Crear transacción de inventario
+                codigo_transaccion = f"{detalle_material.id}-S"
+                nueva_transaccion = TransaccionInventario(
+                    codigo_transaccion=codigo_transaccion,
+                    codigo_material=codigo_material,
+                    descripcion=material.descripcion,
+                    precio_unitario=material.precio_unitario,
+                    fecha_transaccion=requisicion.fecha_creacion,
+                    cantidad_entrada=0,
+                    cantidad_salida=cantidad_solicitada,
+                    existencia_salida=material.existencias
+                )
+                db.session.add(nueva_transaccion)
 
+            db.session.commit()
+            
+            nueva_transaccion.codigo_transaccion = f"{requisicion.nro_requisicion}-S"
+
+            db.session.commit()
+            
             return requisicion
     
         except IntegrityError as e:

@@ -30,13 +30,6 @@ def create():
     result = material_controller.create_material()
     return material_schema.jsonify(result)
 
-# ##################PROBAR##################
-# #CREAR MATERIALES 
-# @material_bp.route("/materiales", methods=['POST'])
-# def create_materiales():
-#     results = material_controller.create_materiales()
-#     return materials_schema.jsonify(results)
-
 #OBTENER MATERIAL
 @cross_origin()
 @material_bp.route("/material/<int:codigo_material>", methods=['GET'])

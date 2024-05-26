@@ -46,6 +46,7 @@ def obtener_todas_las_ordenes():
 
 #FALTA VERIFICAR LA LÓGICA SI, EL PROVEEDOR NO ENTREGA TODOS LOS MATERIALES Y SE ALMACENAN SOLO LOS RECIBIDOS
 #GUARDANDO UN REGISTRO DE PEDIDOS EN ESPERA O REZAGADOS QUE DESCRIBA QUE MATERIAL FALTA, CUANTO Y DE QUE ORDEN
+
 @cross_origin()
 @orden_compra_bp.route('/ordenes_de_compra/<int:nro_orden>/nota_de_entrega', methods=['POST'])
 def agregar_nota_de_entrega(nro_orden):

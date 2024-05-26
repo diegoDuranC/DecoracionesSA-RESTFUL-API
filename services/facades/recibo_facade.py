@@ -10,6 +10,8 @@ from models.cliente.factura_cliente import FacturaCliente
 from models.cliente.recibo import Recibo, ReciboSchema
 from models.proyecto import Proyecto
 
+from decimal import Decimal
+
 class ReciboFacade():
     
     def __init__(self):
@@ -86,9 +88,12 @@ class ReciboFacade():
             fecha_fin_dt = datetime.strptime(fecha_fin, '%Y-%m-%d')
 
         except ValueError:
-            return {"error": "Formato de fecha inválido. Utilice YYYY-MM-DD."}
+            return {"Error": "Formato de fecha inválido. Utilice YYYY-MM-DD."}
         
         query = Recibo.query.filter(Recibo.fecha.between(fecha_inicio_dt,fecha_fin_dt)).all()
+
+        if not query:
+            return {"Error" : "No se encontraron recibos"}
 
         return  self.recibo_schemas.dump(query)
     
@@ -112,3 +117,26 @@ class ReciboFacade():
             return {"Error" : "No hay recibos hoy"}
         
         return self.recibo_schemas.dump(recibos)
+    
+    def obtener_recibos_sin_deposito_monto_total(self, fecha_inicio, fecha_fin):
+        '''
+            Retorna los recibos en un intervalo de fechas que no están asociados a un depósito y la suma total de esos recibos.
+        
+            :param fecha_inicio: Fecha de inicio del intervalo.
+            :param fecha_fin: Fecha de fin del intervalo.
+            :return: Un diccionario con los recibos y el monto total.
+        '''
+        recibos = Recibo.query.filter(
+            Recibo.fecha.between(fecha_inicio, fecha_fin),
+            Recibo.deposito_id == None
+        ).all()
+
+        if not recibos:
+            return {"Error": "No hay recibos por ahora"}
+
+        monto_total = sum(recibo.monto for recibo in recibos)
+
+        return {
+            "recibos": self.recibo_schemas.dump(recibos),
+            "monto_total": str(monto_total)  # Convertir Decimal a string para evitar problemas de serialización
+        }

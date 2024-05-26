@@ -43,8 +43,9 @@ class CuentaPorCobrarSchema(ma.Schema):
 class EstadoCuentaSchema(ma.Schema):
     cliente = fields.Nested(ClienteFacturaSchema)
     factura = fields.Nested(FacturaSchema, only=("nro_factura", "fecha", "total"))
+    pagos = fields.List(fields.Nested(PlanPagoClienteSchema))
     class Meta():
-        fields = ()
+        fields = ("saldo", "cliente", "factura", "pagos")
 
 class CuentaPorCobrarRecibo(ma.Schema):
     factura = fields.Nested(FacturaSchema, only=("nro_factura",))

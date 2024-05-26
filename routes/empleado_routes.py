@@ -9,6 +9,20 @@ empleado_controller = EmpleadoController()
 empleado_schema = EmpleadoSchema()
 empleado_schemas = EmpleadoSchema(many=True)
 
+'''
+    {
+        "ci_empleado": "3087096",
+        "nombre_empleado": "Luis",
+        "apellido_empleado": "Lopez Alvarado",
+        "telefono_empleado": "73274099",
+        "fecha_contratacion": "2018-02-12",
+        "fecha_despido": null o "YYYY-mm-dd"
+        "cargo_id": 9,  
+        "area_id": 11,  
+        "jefe_id": 4  
+    }
+'''
+
 @cross_origin()
 @empleado_bp.route("/empleado", methods=['POST'])
 def crear():
@@ -18,6 +32,20 @@ def crear():
     #     return 404
     
     return empleado_schema.jsonify(empleado)
+
+'''
+    {
+        "ci_empleado": "3087096",
+        "nombre_empleado": "Luis",
+        "apellido_empleado": "Lopez Alvarado",
+        "telefono_empleado": "73274099",
+        "fecha_contratacion": "2018-02-12",
+        "fecha_despido": null o "YYYY-mm-dd"
+        "cargo_id": 9,  
+        "area_id": 11,  
+        "jefe_id": 4  
+    }
+'''
 
 @cross_origin()
 @empleado_bp.route("/empleado/<int:id_empleado>", methods=['PUT'])

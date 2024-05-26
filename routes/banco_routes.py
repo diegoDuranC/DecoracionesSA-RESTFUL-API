@@ -52,3 +52,4 @@ def eliminar_banco(banco_id):
         return jsonify({'error': 'Banco not found or update failed'}), 404
     
     return banco_schema.jsonify(deleted_banco)
+

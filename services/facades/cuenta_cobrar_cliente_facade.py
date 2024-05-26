@@ -1,7 +1,8 @@
 from decimal import Decimal
 from models.cliente.factura_cliente import FacturaCliente
-from models.cliente.cuenta_cobrar import CuentaPorCobrar, CuentaPorCobrarSchema
+from models.cliente.cuenta_cobrar import CuentaPorCobrar, CuentaPorCobrarSchema, EstadoCuentaSchema
 from models.cliente.plan_pago_cliente import PlanPagoCliente, PlanPagoClienteSchema
+from models.cliente.cliente import Cliente
 
 from datetime import datetime, timedelta
 from utils.date_utils import format_date
@@ -143,3 +144,48 @@ class CuentaPorCobrarClienteFacade():
         
         else:
             return cuenta_schema.dump(cuentas)
+        
+    def get_cuentas_cobrar(self):
+
+        cuentas_schema = CuentaPorCobrarSchema(many=True)
+        cuentas = CuentaPorCobrar.query.all()
+
+        if not cuentas:
+            return {"Error" : "No hay cuentas"}
+        
+        return cuentas_schema.dump(cuentas)
+    
+    def get_cuentas_cobrar_ci_pendientes(self, ci_cliente):
+         
+        """
+        Obtiene todas las cuentas por cobrar de un cliente que tengan saldo mayor a 0.
+        
+        :param ci_cliente: CI del cliente.
+        :return: Lista de cuentas por cobrar con saldo mayor a 0.
+        """
+        cuentas_schema = CuentaPorCobrarSchema(many=True)
+
+        cliente = Cliente.query.filter_by(ci_cliente=ci_cliente).first()
+
+        if not cliente:
+            return {"Error": "Cliente no encontrado"}
+
+        cuentas_con_saldo = CuentaPorCobrar.query.filter(
+            CuentaPorCobrar.id_cliente == cliente.id_cliente,
+            CuentaPorCobrar.saldo > 0
+        ).all()
+
+        if not cuentas_con_saldo:
+            #print(cliente.ci_cliente)
+            return {"Error": "No hay cuentas por cobrar con saldo para este cliente"}
+
+        return cuentas_schema.dump(cuentas_con_saldo)
+
+    def generar_estado_cuenta(self, nro_cuenta):
+        cuenta = CuentaPorCobrar.query.get(nro_cuenta)
+
+        cuenta_schema = EstadoCuentaSchema()
+        if not cuenta: 
+            return {"Error" : "No hay cuenta"}
+        
+        return cuenta_schema.dump(cuenta)

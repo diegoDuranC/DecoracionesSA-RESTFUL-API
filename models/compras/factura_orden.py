@@ -22,13 +22,14 @@ class FacturaOrdenCompra(db.Model):
     nro_deposito = Column(Integer, ForeignKey("depositos.nro_deposito"))
     deposito = db.relationship('Deposito', uselist=False, back_populates='factura_orden_compra')
 
-    def __init__(self, nro_proveedor, monto, fecha, descripcion, nro_deposito):
+    def __init__(self, nro_proveedor, monto, fecha, descripcion, nro_deposito, nro_orden):
         self.nro_proveedor = nro_proveedor
         self.fecha = fecha
         self.descripcion = descripcion
         self.monto = monto
         self.nro_deposito = nro_deposito
+        self.nro_orden = nro_orden
 
 class FacturaOrdenCompraSchema(ma.Schema):
     class Meta():
-        fields = ("nro_factura", "nro_proveedor", "monto", "fecha", "descripcion")
+        fields = ("nro_factura", "nro_proveedor", "monto", "fecha", "descripcion", "nro_orden", "nro_deposito")

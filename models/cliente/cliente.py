@@ -31,4 +31,4 @@ class ClienteSchema(ma.Schema):
 class ClienteFacturaSchema(ma.Schema):
     
     class Meta:
-        fields = ('nombre_cliente', 'apellido_cliente', 'numero_cliente')
+        fields = ('nombre_cliente', 'apellido_cliente', 'numero_cliente', 'ci_cliente')

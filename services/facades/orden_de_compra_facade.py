@@ -4,7 +4,6 @@ from app import db
 from models.material.material import Material
 from models.compras.orden_de_compra import OrdenDeCompra, OrdenDeCompraSchema
 from models.compras.detalle_orden import DetalleOrdenCompra, DetalleOrdenCompraSchema
-from models.compras.nota_entrega import NotaDeEntrega
 
 class OrdenDeCompraFacade:
 
@@ -44,9 +43,6 @@ class OrdenDeCompraFacade:
                     nro_orden=nueva_orden.nro_orden
                 )
                 db.session.add(detalle)
-                
-                # Actualizar el inventario
-                material.existencias += cantidad_requerida
             
             db.session.commit()
             return self.orden_schema.dump(nueva_orden)
@@ -80,22 +76,3 @@ class OrdenDeCompraFacade:
         """
         ordenes = OrdenDeCompra.query.all()
         return self.orden_schema.dump(ordenes, many=True)
-    
-    def agregar_nota_de_entrega(self, nro_orden, fecha):
-        try:
-            orden = OrdenDeCompra.query.get(nro_orden)
-            if not orden:
-                return {"Error": "Orden de compra no encontrada"}
-
-            nueva_nota = NotaDeEntrega(nro_orden=nro_orden, fecha=fecha)
-            db.session.add(nueva_nota)
-            
-            # Aquí podrías agregar lógica adicional para verificar físicamente los materiales
-            # Por ejemplo, podrías recorrer los detalles de la orden y realizar alguna verificación
-
-            db.session.commit()
-            return self.nota_schema.dump(nueva_nota)
-        
-        except SQLAlchemyError as e:
-            db.session.rollback()
-            return {"Error": str(e)}

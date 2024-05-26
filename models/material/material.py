@@ -15,6 +15,12 @@ class Material(db.Model):
     # Relación con la tabla asociativa Requisicion
     requisiciones = db.relationship('DetalleMaterialRequisicion', back_populates='material')
 
+    #Asociacion con materiales recibidos
+    materiales_recibidos = db.relationship('MaterialRecibido', back_populates='material')
+
+    #relacion con transacciones
+    transacciones_inventario = db.relationship('TransaccionInventario', back_populates='material')
+
     def __init__(self, descripcion, precio_unitario, existencias):
         self.descripcion = descripcion
         self.precio_unitario = precio_unitario

@@ -21,7 +21,7 @@ def create():
 # ci_cliente = str() -> String del ci del cliente
 
 @cliente_bp.route("/cliente/ci", methods=['GET'])
-def obtener_cliente_ci(ci_cliente):
+def obtener_cliente_ci():
 
     ci_cliente = request.args.get('ci_cliente')
     result = cliente_controller.get_cliente_ci(ci_cliente)

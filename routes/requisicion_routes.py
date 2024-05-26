@@ -17,7 +17,7 @@ single_requisicion_schemas = SingleRequisicionSchema(many=True)
 
 requisicion_facade = RequisicionFacade()
 
-@cross_origin
+
 @requisicion_bp.route("/requisicion_s", methods=['POST'])
 def crear():
     request_data = request.get_json()
@@ -25,7 +25,7 @@ def crear():
 
     return requisicion_schema.jsonify(result)
 
-@cross_origin
+
 @requisicion_bp.route("/requisiciones_s", methods=['GET'])
 def obtener_requisiciones_s():
     results = requisicion_controller.get_requisiciones()
@@ -33,7 +33,6 @@ def obtener_requisiciones_s():
 
     return single_requisicion_schemas.jsonify(results)
 
-@cross_origin
 @requisicion_bp.route("/requisicion_s/<int:nro_requisicion>", methods=['GET'])
 def obtener_requisicion_s(nro_requisicion):
     result = requisicion_controller.get_requisicion(nro_requisicion)
@@ -42,7 +41,7 @@ def obtener_requisicion_s(nro_requisicion):
 
     return requisicion_schema.jsonify(result)
 
-@cross_origin
+
 @requisicion_bp.route("/requisicion_s/<int:nro_requisicion>", methods=['PUT'])
 def actualizar_requisicion(nro_requisicion):
     updated_requisicion = requisicion_controller.update_requisicion(nro_requisicion)
@@ -52,7 +51,7 @@ def actualizar_requisicion(nro_requisicion):
     return requisicion_schema.jsonify(updated_requisicion)
 
 #FACADE
-@cross_origin
+
 @requisicion_bp.route("/requisicion/<int:nro_requisicion>", methods=['GET'])
 def obtener_requisicion(nro_requisicion):
     result = requisicion_facade.get_requisicion(nro_requisicion)
@@ -62,7 +61,6 @@ def obtener_requisicion(nro_requisicion):
     
     return requisicion_schema.jsonify(result)
 
-@cross_origin
 @requisicion_bp.route("/requisiciones", methods=['GET'])
 def obtener_requisiciones():
     query = requisicion_facade.get_requisiciones()

@@ -9,7 +9,7 @@ cuenta_por_cobrar_facade = CuentaPorCobrarClienteFacade()
 
 #GENERAR LAS CUENTAS POR COBRAR
 #Necesita el nro de factura (id de factura)
-@cross_origin()
+
 @cuenta_cobrar_bp.route("/cuenta_cobrar/generar_cuenta/<int:nro_factura>", methods=['POST'])
 def generar_cuenta_por_cobrar(nro_factura):
     
@@ -20,7 +20,7 @@ def generar_cuenta_por_cobrar(nro_factura):
 
 #OBTENER LAS CUENTAS DE UN CLIENTE
 #Necesita el id del cliente (id de factura)
-@cross_origin()
+
 @cuenta_cobrar_bp.route("/cuenta_cobrar/<int:id_cliente>", methods=['GET'])
 def obtener_estados_cliente(id_cliente):
 

@@ -11,7 +11,7 @@ recibo_facade = ReciboFacade()
 #################
 
 #RUTA DE PRUEBA
-@cross_origin()
+
 @recibo_bp.route("/recibo", methods=['GET'])
 def inicio():
     return "INICIO RECIBOS"
@@ -26,7 +26,6 @@ def inicio():
             }
 '''
 
-@cross_origin()
 @recibo_bp.route("/recibo/generar_recibo", methods=['POST'])
 def generar_recibo():
     
@@ -34,7 +33,7 @@ def generar_recibo():
     result = recibo_facade.crear_recibo(request_data=request_data)
     return jsonify(result)
 
-@cross_origin()
+
 @recibo_bp.route('/recibo/filtrar_fecha', methods=['GET'])
 def recibos_por_fecha():
     # Obtiene los recibos por fecha con Query Params del argm
@@ -47,7 +46,7 @@ def recibos_por_fecha():
     return jsonify(recibos)
 
 #DEVUELVE LOS RECIBOS FILTRADOS POR CI
-@cross_origin()
+
 @recibo_bp.route("/recibos/ci", methods=['GET'])
 def recibos_ci_cliente():
 
@@ -57,7 +56,7 @@ def recibos_ci_cliente():
     return jsonify(recibos)
 
 #DEVUELVE LOS RECIBOS DEL DIA
-@cross_origin()
+
 @recibo_bp.route("/recibos/del_dia", methods=['GET'])
 def recibos_del_dia():
 
@@ -66,7 +65,7 @@ def recibos_del_dia():
     return jsonify(recibos)
 
 #DEVUELVE LOS RECIBOS EN INTERVALO DE FECHA SIN DEPOSITO
-@cross_origin
+
 @recibo_bp.route("/recibos/sin_depositar/fecha", methods=['GET'])
 def recibos_del_dia_sin_depositar():
 

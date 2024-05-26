@@ -10,13 +10,13 @@ proyecto_schemas = ProyectoSchema(many=True)
 
 proyecto_bp = Blueprint('proyecto', __name__)
 
-@cross_origin
+
 @proyecto_bp.route("/proyecto", methods=['POST'])
 def crear():
     result = proyecto_controller.create_proyecto()
     return proyecto_schema.jsonify(result)
 
-@cross_origin
+
 @proyecto_bp.route("/proyectos", methods=['GET'])
 def obtener_proyectos():
     results = proyecto_controller.get_proyectos()
@@ -24,7 +24,6 @@ def obtener_proyectos():
 
     return proyecto_schemas.jsonify(results)
 
-@cross_origin
 @proyecto_bp.route("/proyecto/<int:id_proyecto>", methods=['GET'])
 def obtener_proyecto(id_proyecto):
     
@@ -35,7 +34,6 @@ def obtener_proyecto(id_proyecto):
     
     return proyecto_schema.jsonify(result)
 
-@cross_origin
 @proyecto_bp.route("/proyecto/<int:id_proyecto>", methods=['PUT'])
 def actualizar_proyecto(id_proyecto):
     updated_proyecto = proyecto_controller.update_proyecto(id_proyecto)
@@ -45,7 +43,6 @@ def actualizar_proyecto(id_proyecto):
     
     return proyecto_schema.jsonify(updated_proyecto)
 
-@cross_origin
 @proyecto_bp.route("/proyecto/<int:nro_proyecto>", methods=['DELETE'])
 def eliminar_proyecto(nro_proyecto):
     deleted_proyecto = proyecto_controller.delete_proyecto(nro_proyecto)

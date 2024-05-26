@@ -17,7 +17,7 @@ fachada_orden_compra = OrdenDeCompraFacade()
         ]
     }
 '''
-@cross_origin
+
 @orden_compra_bp.route('/ordenes_de_compra', methods=['POST'])
 def crear_orden_de_compra():
 
@@ -29,7 +29,7 @@ def crear_orden_de_compra():
     return jsonify(resultado)
 
 #OBTENER ORDEN POR ID
-@cross_origin()
+
 @orden_compra_bp.route('/ordenes_de_compra/<int:nro_orden>', methods=['GET'])
 def obtener_orden_por_id(nro_orden):
 
@@ -37,7 +37,7 @@ def obtener_orden_por_id(nro_orden):
     return jsonify(resultado)
 
 #OBTEN TODAS LAS ORDENDES DE COMPRA
-@cross_origin()
+
 @orden_compra_bp.route('/ordenes_de_compra', methods=['GET'])
 def obtener_todas_las_ordenes():
 
@@ -47,7 +47,7 @@ def obtener_todas_las_ordenes():
 #FALTA VERIFICAR LA LÓGICA SI, EL PROVEEDOR NO ENTREGA TODOS LOS MATERIALES Y SE ALMACENAN SOLO LOS RECIBIDOS
 #GUARDANDO UN REGISTRO DE PEDIDOS EN ESPERA O REZAGADOS QUE DESCRIBA QUE MATERIAL FALTA, CUANTO Y DE QUE ORDEN
 
-@cross_origin()
+
 @orden_compra_bp.route('/ordenes_de_compra/<int:nro_orden>/nota_de_entrega', methods=['POST'])
 def agregar_nota_de_entrega(nro_orden):
     data = request.json

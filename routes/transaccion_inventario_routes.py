@@ -6,7 +6,7 @@ transaccion_inventario_bp = Blueprint('transaccion_inventario_bp', __name__)
 transaccion_inventario_facade = TransaccionInventarioFacade()
 
 # Obtener todas las transacciones de inventario
-@cross_origin()
+
 @transaccion_inventario_bp.route("/transacciones", methods=['GET'])
 def obtener_todas_las_transacciones():
     result = transaccion_inventario_facade.obtener_todas_las_transacciones()
@@ -14,7 +14,7 @@ def obtener_todas_las_transacciones():
 
 # Obtener transacciones de inventario por fecha
 # Params fecha_inicio fecha_fin formato YYYY-mm-dd
-@cross_origin()
+
 @transaccion_inventario_bp.route("/transacciones/fecha", methods=['GET'])
 def obtener_transacciones_por_fecha():
     fecha_inicio = request.args.get('fecha_inicio')
@@ -23,14 +23,14 @@ def obtener_transacciones_por_fecha():
     return jsonify(result)
 
 # Obtener transacciones de inventario por código de material
-@cross_origin()
+
 @transaccion_inventario_bp.route("/transacciones/material/<int:codigo_material>", methods=['GET'])
 def obtener_transacciones_por_codigo_material(codigo_material):
     result = transaccion_inventario_facade.obtener_transacciones_por_codigo_material(codigo_material)
     return jsonify(result)
 
 # Obtener una transacción específica por ID
-@cross_origin()
+
 @transaccion_inventario_bp.route("/transacciones/<int:id>", methods=['GET'])
 def obtener_transaccion_por_id(id):
     result = transaccion_inventario_facade.obtener_transaccion_por_id(id)
@@ -44,7 +44,7 @@ def obtener_transaccion_por_id(id):
 '''
 
 # Obtener transacciones de entrada por código de material
-@cross_origin()
+
 @transaccion_inventario_bp.route("/transacciones/entrada/material/<int:codigo_material>", methods=['GET'])
 def obtener_transacciones_entrada_por_codigo_material(codigo_material):
     result = transaccion_inventario_facade.obtener_transacciones_entrada_por_codigo_material(codigo_material)
@@ -57,7 +57,7 @@ def obtener_transacciones_entrada_por_codigo_material(codigo_material):
     Función: obtener_transacciones_salida_por_codigo_material
     Descripción: Esta ruta permite obtener todas las transacciones de salida (tipo S) para un material específico identificado por su código.
 '''
-@cross_origin()
+
 @transaccion_inventario_bp.route("/transacciones/salida/material/<int:codigo_material>", methods=['GET'])
 def obtener_transacciones_salida_por_codigo_material(codigo_material):
     result = transaccion_inventario_facade.obtener_transacciones_salida_por_codigo_material(codigo_material)
@@ -79,7 +79,7 @@ Ejemplo solicitud
 
 '''
 # Actualizar una transacción de inventario por su ID
-@cross_origin()
+
 @transaccion_inventario_bp.route("/transaccion_inventario/<int:id>", methods=['PUT'])
 def actualizar_transaccion_inventario(id):
     data = request.get_json()

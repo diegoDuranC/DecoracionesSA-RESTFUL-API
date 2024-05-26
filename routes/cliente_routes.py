@@ -11,7 +11,6 @@ cliente_schema = ClienteSchema()
 clientes_schema = ClienteSchema(many=True)
 
 #Crear Cliente
-@cross_origin()
 @cliente_bp.route("/cliente", methods=['POST'])
 def create():
     result = cliente_controller.create_cliente()
@@ -21,7 +20,6 @@ def create():
 #Enviar en los Query Params
 # ci_cliente = str() -> String del ci del cliente
 
-@cross_origin()
 @cliente_bp.route("/cliente/ci", methods=['GET'])
 def obtener_cliente_ci(ci_cliente):
 
@@ -34,7 +32,7 @@ def obtener_cliente_ci(ci_cliente):
     return cliente_schema.jsonify(result)
 
 #OBTENER CLIENTE POR ID
-@cross_origin()
+
 @cliente_bp.route("/cliente/<int:id_cliente>", methods=['GET'])
 def obtener_cliente_id(id_cliente):
     result = cliente_controller.get_cliente_id(id_cliente)
@@ -45,7 +43,7 @@ def obtener_cliente_id(id_cliente):
     return cliente_schema.jsonify(result)
 
 #OBTENER CLIENTES
-@cross_origin()
+
 @cliente_bp.route("/clientes", methods=['GET'])
 def obtener_clientes():
     results = cliente_controller.get_clientes()
@@ -54,7 +52,7 @@ def obtener_clientes():
     return clientes_schema.jsonify(results)
 
 # #ACTUALIZAR PARCIALMENTE "PUT"
-@cross_origin()
+
 @cliente_bp.route("/cliente/<int:id_cliente>", methods=['PUT'])
 def actualizar_campos(id_cliente):
     updated_cliente = cliente_controller.update_cliente(id_cliente)
@@ -65,7 +63,7 @@ def actualizar_campos(id_cliente):
     return cliente_schema.jsonify(updated_cliente)
 
 #ELIMINAR
-@cross_origin()
+
 @cliente_bp.route("/cliente/<int:id_cliente>", methods=['DELETE'])
 def eliminar_cliente(id_cliente):
     deleted_cliente = cliente_controller.delete_cliente(id_cliente)

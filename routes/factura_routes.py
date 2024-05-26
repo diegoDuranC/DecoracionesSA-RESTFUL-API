@@ -13,7 +13,7 @@ factura_schemas = FacturaSchema(many=True)
 factura_facade = FacturaClienteFacade()
 #CREAR LA FACTURA CLIENTE
 #SE NECESITA EL NUMERO DE PROYECTO PARA GENERAR LA FACTURA
-@cross_origin()
+
 @cliente_bp.route("/cliente/factura/crear_factura/<int:nro_proyecto>", methods=['GET'])
 def crear_factura(nro_proyecto):
     proyecto = Proyecto.query.get(nro_proyecto)
@@ -27,7 +27,7 @@ def crear_factura(nro_proyecto):
     return jsonify(result)
 
 #OBTENER FACTURAS
-@cross_origin()
+
 @cliente_bp.route("/cliente/factura/", methods=['GET'])
 def obtener_factura():
 
@@ -37,7 +37,7 @@ def obtener_factura():
     return jsonify(result)
 
 #OBTENER FACTURAS POR CLIENTE
-@cross_origin()
+
 @cliente_bp.route("/cliente/factura/<int:id_cliente>", methods=['GET'])
 def obtener_factura_cliente(id_cliente):
     

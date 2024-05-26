@@ -14,7 +14,7 @@ nota_de_entrega_facade = NotaDeEntregaFacade()
 #       {"cod_material": 2, "cantidad_recibida": 3}
 #   ]
 # }
-@cross_origin()
+
 @nota_entrega_bp.route('/nota_de_entrega', methods=['POST'])
 def agregar_nota_de_entrega():
     data = request.get_json()
@@ -26,14 +26,14 @@ def agregar_nota_de_entrega():
 # Ruta para obtener una nota de entrega específica por su número de nota
 # Parámetros de URL:
 # - nro_nota: Número de la nota de entrega
-@cross_origin()
+
 @nota_entrega_bp.route('/nota_de_entrega/<int:nro_nota>', methods=['GET'])
 def obtener_nota_de_entrega(nro_nota):
     result = nota_de_entrega_facade.obtener_nota_de_entrega(nro_nota)
     return jsonify(result)
 
 # Ruta para obtener todas las notas de entrega
-@cross_origin()
+
 @nota_entrega_bp.route('/notas_de_entrega', methods=['GET'])
 def obtener_notas_de_entrega():
     result = nota_de_entrega_facade.obtener_todas_las_notas_de_entrega()
@@ -42,7 +42,7 @@ def obtener_notas_de_entrega():
 # Ruta para obtener entregas pendientes específicas por su número de nota
 # Parámetros de URL:
 # - nro_nota: Número de la nota de entrega
-@cross_origin()
+
 @nota_entrega_bp.route('/entrega_pendiente/<int:nro_nota>', methods=['GET'])
 def obtener_entrega_pendiente(nro_nota):
     result = nota_de_entrega_facade.obtener_entrega_pendiente_nro_nota(nro_nota)

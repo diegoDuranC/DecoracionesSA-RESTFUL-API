@@ -3,6 +3,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_marshmallow import Marshmallow
 from config.config import Config
 from flask_cors import CORS
+#from flask_swagger_ui import get_swaggerui_blueprint
 
 db = SQLAlchemy()
 ma = Marshmallow()
@@ -14,7 +15,8 @@ def create_app():
     db.init_app(app)
     ma.init_app(app)
 
-    CORS(app)
+    CORS(app, resources={r"/*": {"origins": "*"}})
+
 
     with app.app_context():
         # Importar las rutas aquí evita la importacion circular
@@ -51,6 +53,7 @@ def create_app():
         app.register_blueprint(deposito_bp)
         app.register_blueprint(cuenta_cobrar_bp)
         app.register_blueprint(transaccion_inventario_bp)
+        #app.register_blueprint(swaggerui_blueprint)
     
     return app
 

@@ -9,13 +9,13 @@ area_controller = AreaController()
 area_schema = AreaSchema()
 area_schemas = AreaSchema(many=True)
 
-@cross_origin()
+
 @area_bp.route("/area", methods=['POST'])
 def crear():
     result = area_controller.create_area()
     return area_schema.jsonify(result)
 
-@cross_origin()
+
 @area_bp.route("/areas", methods=['GET'])
 def obtener_areas():
     results = area_controller.get_areas()
@@ -23,7 +23,6 @@ def obtener_areas():
 
     return area_schemas.jsonify(results)
 
-@cross_origin()
 @area_bp.route("/area/<int:cod_area>", methods=['GET'])
 def obtener_area(cod_area):
     result = area_controller.get_area(cod_area)
@@ -33,13 +32,12 @@ def obtener_area(cod_area):
 
     return area_schema.jsonify(result)
 
-@cross_origin
 @area_bp.route("/area/<int:cod_area>", methods=['PUT'])
 def actualizar_area(cod_area):
     updated_area = area_controller.update_area(cod_area)
     return area_schema.jsonify(updated_area)
 
-@cross_origin
+
 @area_bp.route("/area/<int:cod_area>", methods=['DELETE'])
 def delete_area(cod_area):
     deleted_area = area_controller.delete_area(cod_area)

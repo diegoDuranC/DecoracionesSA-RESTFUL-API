@@ -18,20 +18,20 @@ detalle_controller = DetalleMaterialesController()
 detalle_material_schema = DetalleMaterialSolicitadoSchema()
 detalle_material_schemas = DetalleMaterialSolicitadoSchema(many=True)
 
-@cross_origin()
+
 @material_bp.route("/")
 def inicio():
     return "INICIO"
 
 #CREAR MATERIAL
-@cross_origin()
+
 @material_bp.route("/material", methods=['POST'])
 def create():
     result = material_controller.create_material()
     return material_schema.jsonify(result)
 
 #OBTENER MATERIAL
-@cross_origin()
+
 @material_bp.route("/material/<int:codigo_material>", methods=['GET'])
 def obtener_material(codigo_material):
     result = material_controller.get_material(codigo_material)
@@ -42,7 +42,7 @@ def obtener_material(codigo_material):
     return material_schema.jsonify(result)
 
 #OBTENER MATERIALES
-@cross_origin()
+
 @material_bp.route("/materiales", methods=['GET'])
 def obtener_materiales():
     results = material_controller.get_materiales()
@@ -51,7 +51,7 @@ def obtener_materiales():
     return materials_schema.jsonify(results)
 
 #ACTUALIZAR PARCIALMENTE "PUT"
-@cross_origin()
+
 @material_bp.route("/material/<int:codigo_material>", methods=['PUT'])
 def actualizar_campos(codigo_material):
     updated_material = material_controller.update_material(codigo_material)
@@ -62,7 +62,7 @@ def actualizar_campos(codigo_material):
     return material_schema.jsonify(updated_material)
 
 #ELIMINAR
-@cross_origin()
+
 @material_bp.route("/material/<int:codigo_material>", methods=['DELETE'])
 def eliminar_material(codigo_material):
     deleted_material = material_controller.delete_material(codigo_material)
@@ -73,21 +73,21 @@ def eliminar_material(codigo_material):
     return material_schema.jsonify(deleted_material)
 
 #DETALLE
-@cross_origin()
+
 @material_bp.route("/material/detalle_material", methods=['GET'])
 def get_detalles():
     result = detalle_controller.get_detalles()
     result = detalle_material_schemas.dump(result)
     return jsonify(result)
 
-@cross_origin()
+
 @material_bp.route("/material/detalle_material/<int:nro_requisicion>", methods=['GET'])
 def get_detalles_requisicion(nro_requisicion):
     result = detalle_controller.get_detalles_requisicion(nro_requisicion)
     result = detalle_material_schemas.dump(result)
     return jsonify(result)
 
-@cross_origin()
+
 @material_bp.route("/material/detalle_material/<int:nro_requisicion>/<int:id_detalle>/<int:cod_material>", methods=['PUT'])
 def actualizar_campos_detalle(id_detalle, nro_requisicion, cod_material):
     updated = detalle_controller.actualizar_detalle(id_detalle, nro_requisicion, cod_material)

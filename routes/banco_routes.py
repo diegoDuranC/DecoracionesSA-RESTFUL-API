@@ -9,13 +9,13 @@ banco_controller = BancoController()
 banco_schema = BancoSchema()
 banco_schemas = BancoSchema(many=True)
 
-@cross_origin
+
 @banco_bp.route("/banco", methods=['POST'])
 def crear():
     result = banco_controller.create_banco()
     return banco_schema.jsonify(result)
 
-@cross_origin
+
 @banco_bp.route("/bancos", methods=['GET'])
 def obtener_bancos():
     result = banco_controller.get_bancos()
@@ -23,7 +23,7 @@ def obtener_bancos():
 
     return banco_schemas.jsonify(result)
 
-@cross_origin
+
 @banco_bp.route("/banco/<int:banco_id>", methods=['GET'])
 def obtener_banco(banco_id):
     result = banco_controller.get_banco(banco_id)
@@ -33,7 +33,7 @@ def obtener_banco(banco_id):
 
     return banco_schema.jsonify(result)
 
-@cross_origin()
+
 @banco_bp.route("/banco/<int:banco_id>", methods=['PUT'])
 def actualizar_campos(banco_id):
     updated_banco = banco_controller.update_banco(banco_id)
@@ -43,7 +43,7 @@ def actualizar_campos(banco_id):
 
     return banco_schema.jsonify(updated_banco)
 
-@cross_origin
+
 @banco_bp.route("/banco/<int:banco_id>", methods=['DELETE'])
 def eliminar_banco(banco_id):
     deleted_banco = banco_controller.delete_banco(banco_id)

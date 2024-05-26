@@ -5,14 +5,13 @@ from services.facades.deposito_facade import DepositoFacade
 deposito_bp = Blueprint('deposito_bp', __name__)
 deposito_facade = DepositoFacade()
 
-@cross_origin()
 @deposito_bp.route('/deposito', methods=['GET'])
 def inicio():
     return "Testing Route"
 
 
 #DEBE SER UN EMPLEADO DEL AREA DE VENTAS, AYUDANTE DE VENTAS
-@cross_origin()
+
 @deposito_bp.route('/deposito', methods=['POST'])
 def crear_deposito():
     data = request.get_json()
@@ -25,7 +24,7 @@ def crear_deposito():
     result = deposito_facade.crear_deposito(cuenta, fecha, monto, banco_id, forma_pago)
     return jsonify(result)
 
-@cross_origin()
+
 @deposito_bp.route('/deposito/crear_desde_recibos_del_dia', methods=['POST'])
 def crear_deposito_desde_recibos_del_dia():
     data = request.get_json()

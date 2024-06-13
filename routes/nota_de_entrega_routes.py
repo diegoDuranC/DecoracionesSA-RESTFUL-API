@@ -14,7 +14,9 @@ nota_de_entrega_facade = NotaDeEntregaFacade()
 #       {"cod_material": 2, "cantidad_recibida": 3}
 #   ]
 # }
-
+'''
+    PARA QUE EL ESTADO CAMBIE A SATIFECHO SE COLOCA SI O SI LA CANTIDAD NECESITADA DE LOS MATERIALES POR COMPLETO EN UNA SOLA NOTA
+'''
 @nota_entrega_bp.route('/nota_de_entrega', methods=['POST'])
 def agregar_nota_de_entrega():
     data = request.get_json()

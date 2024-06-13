@@ -11,16 +11,23 @@ class FacturaOrdenCompraFacade:
         self.factura_schema = FacturaOrdenCompraSchema()
         self.factura_schemas = FacturaOrdenCompraSchema(many=True)
 
-    def crear_factura(self, nro_orden, nro_proveedor, monto, descripcion, nro_deposito):
+    #OBTIENE EL MONTO EN BASE AL MONTO DEL DEPOSITO, ES DECIR, COMO SI SE PAGARA DE UNA SOLA VEZ todo su importe
+    def crear_factura(self, nro_orden, id_proveedor, descripcion, nro_deposito):
         try:
+            deposito = Deposito.query.get(nro_deposito)
+
+            if not deposito: 
+                return {"error" : "deposito no encontrado"}
+            
             nueva_factura = FacturaOrdenCompra(
                 nro_orden=nro_orden,
-                nro_proveedor=nro_proveedor,
-                monto=monto,
+                id_proveedor=id_proveedor,
+                monto=deposito.monto,
                 fecha=datetime.now().strftime("%Y-%m-%d"),
                 descripcion=descripcion,
                 nro_deposito=nro_deposito
             )
+
             db.session.add(nueva_factura)
             db.session.commit()
             return self.factura_schema.dump(nueva_factura)
@@ -37,3 +44,34 @@ class FacturaOrdenCompraFacade:
     def obtener_todas_las_facturas(self):
         facturas = FacturaOrdenCompra.query.all()
         return self.factura_schemas.dump(facturas)
+    
+    def actualizar_factura(self, nro_factura, monto, fecha, descripcion, nro_deposito, nro_orden):
+
+        deposito = Deposito.query.get(nro_deposito)
+
+        if not deposito:
+            return {"mensaje" : "Deposito no encontrado"}
+        
+        factura = FacturaOrdenCompra.query.get(nro_factura)
+
+        if not monto:
+            monto = deposito.monto
+
+        if factura:
+            factura.monto = monto
+            factura.fecha = fecha
+            factura.descripcion = descripcion
+            factura.nro_deposito = nro_deposito
+            db.session.commit()
+
+            return FacturaOrdenCompraSchema().dump(factura)
+        
+        return {'mensaje': 'Factura no encontrada'}, 404
+
+    def eliminar_factura(self, nro_factura):
+        factura = FacturaOrdenCompra.query.get(nro_factura)
+        if factura:
+            db.session.delete(factura)
+            db.session.commit()
+            return {'mensaje': 'Factura eliminada exitosamente'}
+        return {'mensaje': 'Factura no encontrada'}, 404

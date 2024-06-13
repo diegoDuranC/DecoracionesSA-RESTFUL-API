@@ -3,7 +3,9 @@ from sqlalchemy import Column, Integer, String, ForeignKey, Date, Numeric, Enum 
 from marshmallow import fields
 from enum import Enum
 
-from models.cliente.recibo import ReciboSchema 
+from models.banco.banco import BancoSchema
+from models.cliente.recibo import ReciboSchema
+from models.compras.factura_orden import FacturaOrdenCompraSchema 
 
 class FormaPago(Enum):
     EFECTIVO = "EFECTIVO"
@@ -32,17 +34,20 @@ class Deposito(db.Model):
     # Relación uno a uno con FacturaOrdenCompra
     factura_orden_compra = db.relationship('FacturaOrdenCompra', uselist=False, back_populates='deposito')
 
-    def __init__(self, cuenta, fecha, monto, banco_id, forma_pago):
+    def __init__(self, cuenta, fecha, monto, banco_id, forma_pago, empleado_id):
         self.cuenta = cuenta
         self.fecha = fecha
         self.monto = monto
         self.banco_id = banco_id
         self.forma_pago = forma_pago
+        self.empleado_id = empleado_id
 
 class DepositoSchema(ma.Schema):
     forma_pago = fields.Method("get_forma_pago")
+    banco = fields.Nested(BancoSchema)
+    factura_orden_compra = fields.Nested(FacturaOrdenCompraSchema, exclude=('deposito',))
     class Meta():
-        fields = ("nro_deposito", "cuenta", "monto", "fecha", "banco_id", "forma_pago")
+        fields = ("nro_deposito", "cuenta", "monto", "fecha", "banco", "forma_pago", "factura_orden_compra")
 
     def get_forma_pago(self,obj):
         return obj.forma_pago.value

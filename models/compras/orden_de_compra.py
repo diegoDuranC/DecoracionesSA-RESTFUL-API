@@ -34,9 +34,9 @@ class OrdenDeCompra(db.Model):
 class OrdenDeCompraSchema(ma.Schema):
     detalles = fields.List(fields.Nested('DetalleOrdenCompraSchema', exclude=("nro_orden",)))
     estado_compra = fields.Method("get_estado_compra")
-    
+    notas_entrega = fields.List(fields.Nested('NotaDeEntregaSchema'))
     class Meta:
-        fields = ("nro_orden", "cod_orden", "fecha", "detalles", "descripcion", "estado_compra")
+        fields = ("nro_orden", "cod_orden", "fecha", "detalles", "descripcion", "estado_compra", "notas_entrega")
 
     def get_estado_compra(self,obj):
         return obj.estado_compra.value

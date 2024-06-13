@@ -17,15 +17,26 @@ class DepositoFacade:
 
     def get_depositos(self):
         consulta = Deposito.query.all()
+        if not consulta:
+            return {"mensaje" : "no hay depositos"}
+        
         return self.deposito_recibo_schemas.dump(consulta)
+    
+    def get_depositos_facturas(self):
+        consulta = Deposito.query.all()
+        if not consulta:
+            return {"mensaje" : "no hay depositos"}
+        
+        return self.depositos_schema.dump(consulta)
 
-    def crear_deposito(self, cuenta, fecha, monto, banco_id, forma_pago):
+    def crear_deposito(self, cuenta, fecha, monto, banco_id, forma_pago, empleado_id):
         try:
             nuevo_deposito = Deposito(
                 cuenta=cuenta,
                 fecha=fecha,
                 monto=monto,
                 banco_id=banco_id,
+                empleado_id=empleado_id,
                 forma_pago=FormaPago[forma_pago]  # Asegura que el valor de forma_pago sea una opción válida
             )
 

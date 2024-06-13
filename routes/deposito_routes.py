@@ -16,6 +16,12 @@ def get_depositos():
     result = deposito_facade.get_depositos()
     return jsonify(result)
 
+#OBTENER LOS DEPOSITOS DE LAS FACTURAS
+@deposito_bp.route("/depositos/facturas_orden", methods=['GET'])
+def get_depositos_facturas():
+    result = deposito_facade.get_depositos_facturas()
+    return jsonify(result)
+
 #DEBE SER UN EMPLEADO DEL AREA DE VENTAS, AYUDANTE DE VENTAS
 
 @deposito_bp.route('/deposito', methods=['POST'])
@@ -26,8 +32,9 @@ def crear_deposito():
     monto = data.get('monto')
     banco_id = data.get('banco_id')
     forma_pago = data.get('forma_pago')
+    empleado_id = data.get('empleado_id')
     
-    result = deposito_facade.crear_deposito(cuenta, fecha, monto, banco_id, forma_pago)
+    result = deposito_facade.crear_deposito(cuenta=cuenta, fecha=fecha, empleado_id=empleado_id, monto=monto, banco_id=banco_id, forma_pago=forma_pago)
     return jsonify(result)
 
 

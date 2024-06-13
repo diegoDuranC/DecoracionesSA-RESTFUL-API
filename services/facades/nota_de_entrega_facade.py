@@ -32,6 +32,60 @@ class NotaDeEntregaFacade:
             return {"Error": "No se encontró la nota"}
         return self.nota_de_entrega_schema.dump(nota)    
 
+    def _actualizar_estado_orden(self, orden):
+        todos_materiales_completos = True
+        cantidades_totales_recibidas = {}
+
+        if not orden.notas_entrega:
+            orden.estado_compra = EstadoCompra.PENDIENTE
+            db.session.commit()
+
+        print(f"Procesando orden {orden.nro_orden} con notas de entrega: {orden.notas_entrega}")
+
+        # Recorrer todas las notas de entrega de la orden
+        for nota in orden.notas_entrega:
+            print(f"Procesando nota de entrega {nota.nro_nota}")
+            for material_recibido in nota.materiales_recibidos:
+                print(f"Procesando material recibido ID {material_recibido.id_material} con cantidad {material_recibido.cantidad_recibida}")
+                material_id = material_recibido.id_material
+                cantidad_recibida_total = material_recibido.cantidad_recibida
+
+                # Acumular la cantidad recibida por material
+                if material_id not in cantidades_totales_recibidas:
+                    cantidades_totales_recibidas[material_id] = 0
+                cantidades_totales_recibidas[material_id] += cantidad_recibida_total
+
+        # Imprimir las cantidades totales recibidas para depuración
+        print(f"cantidades_totales_recibidas: {cantidades_totales_recibidas}")
+
+        # Revisar cada detalle de la orden para ver si se ha recibido la cantidad requerida
+        for detalle in orden.detalles:
+            cantidad_requerida = detalle.cantidad_requerida
+            cantidad_recibida = cantidades_totales_recibidas.get(detalle.id_material, 0)
+
+            print(f"Material ID {detalle.id_material}: cantidad requerida = {cantidad_requerida}, cantidad recibida = {cantidad_recibida}")
+
+            if cantidad_recibida < cantidad_requerida:
+                todos_materiales_completos = False
+                print(f"Falta recibir materiales para el detalle del material ID {detalle.id_material}.")
+                break
+
+        # Actualizar el estado de la orden basado en las cantidades recibidas
+        if todos_materiales_completos:
+            orden.estado_compra = EstadoCompra.SATISFECHA
+            print(f"Todos los materiales están completos. Orden {orden.nro_orden} satisfecha.")
+        elif any(cantidades_totales_recibidas.values()):
+            orden.estado_compra = EstadoCompra.PARCIALMENTE_SATISFECHA
+            print(f"Faltan materiales por recibir. Orden {orden.nro_orden} parcialmente satisfecha.")
+        else:
+            orden.estado_compra = EstadoCompra.PENDIENTE
+            print(f"No se ha recibido ningún material. Orden {orden.nro_orden} pendiente.")
+
+        db.session.add(orden)
+        db.session.flush()
+
+
+
     def agregar_nota_de_entrega(self, nro_orden, materiales_recibidos):
         try:
             orden = OrdenDeCompra.query.get(nro_orden)
@@ -41,28 +95,6 @@ class NotaDeEntregaFacade:
             if orden.estado_compra == EstadoCompra.SATISFECHA:
                 return {"Mensaje": "La orden ya fue satisfecha"}
 
-            for material in materiales_recibidos:
-                id_material = material.get('id_material')
-                cantidad_recibida = material.get('cantidad_recibida')
-
-                detalle = next((detalle for detalle in orden.detalles if detalle.id_material == id_material), None)
-                if not detalle:
-                    return {"Error": f"Material ID {id_material} no encontrado en la orden"}
-
-                cantidad_requerida = detalle.cantidad_requerida
-                cantidad_recibida_actual = sum(
-                    m.cantidad_recibida for nota in orden.notas_entrega 
-                    for m in nota.materiales_recibidos 
-                    if m.id_material == id_material
-                )
-
-                if cantidad_recibida > cantidad_requerida:
-                    return {"Error": f"La cantidad recibida de material ID {id_material} excede la cantidad requerida"}
-
-                cantidad_faltante = cantidad_requerida - cantidad_recibida_actual
-                if cantidad_recibida > cantidad_faltante:
-                    return {"Error": f"La cantidad recibida de material ID {id_material} excede la cantidad faltante por recibir"}
-
             nueva_nota = NotaDeEntrega(nro_orden=nro_orden)
             db.session.add(nueva_nota)
             db.session.flush()
@@ -71,71 +103,29 @@ class NotaDeEntregaFacade:
                 id_material = material.get('id_material')
                 cantidad_recibida = material.get('cantidad_recibida')
 
-                nuevo_material_recibido = MaterialRecibido(
+                material_recibido = MaterialRecibido(
+                    nro_nota=nueva_nota.nro_nota,
                     id_material=id_material,
-                    cantidad_recibida=cantidad_recibida,
-                    nro_nota=nueva_nota.nro_nota
+                    cantidad_recibida=cantidad_recibida
                 )
+                db.session.add(material_recibido)
 
-                db.session.add(nuevo_material_recibido)
-
-                # Verificar si los materiales recibidos se están guardando correctamente
-                print(f"Material recibido guardado: {nuevo_material_recibido}")
-
-                material_actualizado = Material.query.get(id_material)
-                if material_actualizado:
-                    material_actualizado.existencias += cantidad_recibida
-
-                    codigo_transaccion = f"{nuevo_material_recibido.id}-E"
-                    nueva_transaccion = TransaccionInventario(
-                        codigo_transaccion=codigo_transaccion,
-                        fecha_transaccion=nueva_nota.fecha,
-                        id_material=id_material,
-                        descripcion=material_actualizado.descripcion,
-                        precio_unitario=material_actualizado.precio_unitario,
-                        cantidad_entrada=cantidad_recibida,
-                        cantidad_salida=0,
-                        existencia_salida=material_actualizado.existencias,
-                        material_recibido_id=nuevo_material_recibido.id
-                    )
-                    db.session.add(nueva_transaccion)
+                material_db = Material.query.get(id_material)
+                material_db.existencias += cantidad_recibida
 
             db.session.flush()
-            self._actualizar_estado_orden(orden, nueva_nota)
+
+            # Llamar a la función para actualizar el estado de la orden
+            self._actualizar_estado_orden(orden)
 
             db.session.commit()
-            return self.nota_de_entrega_schema.dump(nueva_nota)
+            return {"Mensaje": "Nota de entrega agregada correctamente"}
 
         except SQLAlchemyError as e:
             db.session.rollback()
             return {"Error": str(e)}
-        
-    def _actualizar_estado_orden(self, orden, nota_actual):
-        todos_materiales_completos = True
 
-        for detalle in orden.detalles:
-            cantidad_requerida = detalle.cantidad_requerida
-            cantidad_recibida = sum(material.cantidad_recibida for material in nota_actual.materiales_recibidos if material.id_material == detalle.id_material)
 
-            # Verificar la cantidad recibida para cada material
-            print(f"Material ID {detalle.id_material}: cantidad requerida = {cantidad_requerida}, cantidad recibida = {cantidad_recibida}")
-
-            if cantidad_recibida < cantidad_requerida:
-                todos_materiales_completos = False
-                print(f"Falta recibir materiales para el detalle del material ID {detalle.id_material}.")
-                break
-
-            # Actualizar el estado de la orden inmediatamente
-            if todos_materiales_completos:
-                orden.estado_compra = EstadoCompra.SATISFECHA
-                print(f"Todos los materiales están completos. Orden {orden.nro_orden} satisfecha.")
-            else:
-                orden.estado_compra = EstadoCompra.PARCIALMENTE_SATISFECHA
-                print(f"Faltan materiales por recibir. Orden {orden.nro_orden} parcialmente satisfecha.")
-
-        # Actualizar el estado de la orden en la base de datos
-        db.session.add(orden)
-        db.session.flush()
 
     def eliminar_nota_de_entrega(self, nro_nota):
         try:
@@ -158,11 +148,15 @@ class NotaDeEntregaFacade:
 
             db.session.delete(nota)
             db.session.flush()
+
+            # Actualizar el estado de la orden después de eliminar la nota
             self._actualizar_estado_orden(orden)
 
             db.session.commit()
             return {"Mensaje": "Nota de entrega eliminada correctamente"}
-        
+
         except SQLAlchemyError as e:
             db.session.rollback()
             return {"Error": str(e)}
+
+

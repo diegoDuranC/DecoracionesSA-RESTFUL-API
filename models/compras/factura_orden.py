@@ -37,4 +37,4 @@ class FacturaOrdenCompraSchema(ma.Schema):
     proveedor = fields.Nested(ProveedorSchema)
     orden_de_compra = fields.Nested(OrdenDeCompraSchema, only=('detalles',))
     class Meta():
-        fields = ("nro_factura", 'proveedor', "monto", "fecha", "descripcion", "nro_orden", "nro_deposito")
+        fields = ("nro_factura", 'proveedor', "monto", "fecha", "descripcion", "orden_de_compra", "deposito")

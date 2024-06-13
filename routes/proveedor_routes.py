@@ -35,10 +35,10 @@ def obtener_proveedores():
 
     return proveedor_schemas.jsonify(results)
 
-#OBTIENE PROVEEDOR POR NRO DE PROVEEDOR
-@proveedor_bp.route('/proveedor/<int:nro_proveedor>', methods=['GET'])
-def obtener_proveedor(nro_proveedor):
-    result = proveedor_controller.get_proveedor(nro_proveedor)
+#OBTIENE PROVEEDOR POR ID PROVEEDOR
+@proveedor_bp.route('/proveedor/<int:id_proveedor>', methods=['GET'])
+def obtener_proveedor(id_proveedor):
+    result = proveedor_controller.get_proveedor(id_proveedor)
     
     if not result:
         return jsonify({'error': 'Proveedor no encontrado'})
@@ -58,7 +58,6 @@ def obtener_proveedor_cod_proveedor():
     result = proveedor_controller.get_proovedor_cod_proveedor(cod_proveedor=cod_proveedor)
     return proveedor_schema.jsonify(result)
 
-
 '''
     {
         "cod_proveedor": "FT-11111111",
@@ -70,9 +69,9 @@ def obtener_proveedor_cod_proveedor():
     }
 '''
 #ACTUALIZAR EL PROVEEDOR
-@proveedor_bp.route("/proveedor/<int:nro_proveedor>", methods=['PUT'])
-def actualizar_campos(nro_proveedor):
-    updated_proveedor = proveedor_controller.update_proveedor(nro_proveedor)
+@proveedor_bp.route("/proveedor/<int:id_proveedor>", methods=['PUT'])
+def actualizar_campos(id_proveedor):
+    updated_proveedor = proveedor_controller.update_proveedor(id_proveedor)
 
     if updated_proveedor is None:
         return jsonify({'error' : 'Proveedor no encontrado'}), 404
@@ -80,9 +79,9 @@ def actualizar_campos(nro_proveedor):
     return proveedor_schema.jsonify(updated_proveedor)
 
 #ELIMINAR EL PROVEEDOR
-@proveedor_bp.route("/proveedor/<int:nro_proveedor>", methods=['DELETE'])
-def eliminar_proveedor(nro_proveedor):
-    deleted_proveedor = proveedor_controller.delete_proveedor(nro_proveedor)
+@proveedor_bp.route("/proveedor/<int:id_proveedor>", methods=['DELETE'])
+def eliminar_proveedor(id_proveedor):
+    deleted_proveedor = proveedor_controller.delete_proveedor(id_proveedor)
 
     if deleted_proveedor is None:
         return jsonify({'error': 'Proveedor no encontrado'}), 404

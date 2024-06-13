@@ -26,39 +26,19 @@ def agregar_nota_de_entrega():
 # Ruta para obtener una nota de entrega específica por su número de nota
 # Parámetros de URL:
 # - nro_nota: Número de la nota de entrega
-
 @nota_entrega_bp.route('/nota_de_entrega/<int:nro_nota>', methods=['GET'])
 def obtener_nota_de_entrega(nro_nota):
     result = nota_de_entrega_facade.obtener_nota_de_entrega(nro_nota)
     return jsonify(result)
 
 # Ruta para obtener todas las notas de entrega
-
 @nota_entrega_bp.route('/notas_de_entrega', methods=['GET'])
 def obtener_notas_de_entrega():
     result = nota_de_entrega_facade.obtener_todas_las_notas_de_entrega()
     return jsonify(result)
 
-# Ruta para obtener entregas pendientes específicas por su número de nota
-# Parámetros de URL:
-# - nro_nota: Número de la nota de entrega
-
-@nota_entrega_bp.route('/entrega_pendiente/<int:nro_nota>', methods=['GET'])
-def obtener_entrega_pendiente(nro_nota):
-    result = nota_de_entrega_facade.obtener_entrega_pendiente_nro_nota(nro_nota)
-    return jsonify(result)
-
-# Ruta para actualizar el estado de una entrega pendiente
-# Parámetros de URL:
-# - id: ID de la entrega pendiente
-# Parámetros JSON:
-# {
-#   "estado": "ENTREGADO"
-# }
-# @cross_origin()
-# @nota_entrega_bp.route('/entrega_pendiente/<int:id>', methods=['PUT'])
-# def actualizar_estado_entrega_pendiente(id):
-#     data = request.get_json()
-#     estado = data.get('estado')
-#     result = nota_de_entrega_facade.actualizar_entrega_pendiente(id, estado)
-#     return jsonify(result)
+#RUTA PARA ELIMINAR UNA NOTA DE ENTREGA, CON LAS TRANSACCIONES, Y AJUSTE DE LAS EXISTENCIAS DE MATERIAL
+@nota_entrega_bp.route('/nota_de_entrega/<int:nro_nota>', methods=['DELETE'])
+def eliminar_nota_de_entrega(nro_nota):
+    resultado = nota_de_entrega_facade.eliminar_nota_de_entrega(nro_nota)
+    return jsonify(resultado)

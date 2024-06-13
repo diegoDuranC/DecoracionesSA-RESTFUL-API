@@ -2,29 +2,20 @@ from datetime import datetime
 from sqlalchemy.exc import SQLAlchemyError
 from app import db
 from models.material.material import Material
+
 from models.compras.nota_de_entrega import NotaDeEntrega, NotaDeEntregaSchema
-from models.compras.entrega_pendiente import EntregaPendiente, EntregaPendienteSchema, EstadoEntrega
-from models.compras.detalle_material_pendiente import DetalleMaterialPendiente, DetalleMaterialPendienteSchema
 from models.compras.material_recibido import MaterialRecibido, MaterialRecibidoSchema
-from models.compras.orden_de_compra import OrdenDeCompra
+
+from models.compras.orden_de_compra import OrdenDeCompra, EstadoCompra
 from models.material.transacciones_inventario import TransaccionInventario
 
 class NotaDeEntregaFacade:
+
     def __init__(self):
         self.nota_de_entrega_schema = NotaDeEntregaSchema()
         self.nota_de_entrega_schemas = NotaDeEntregaSchema(many=True)
-        self.entrega_pendiente_schema = EntregaPendienteSchema()
-        self.entrega_pendiente_schemas = EntregaPendienteSchema(many=True)
-        self.detalle_material_pendiente_schema = DetalleMaterialPendienteSchema()
-        self.detalle_material_pendiente_schemas = DetalleMaterialPendienteSchema(many=True)
         self.material_recibido_schema = MaterialRecibidoSchema()
         self.material_recibido_schemas = MaterialRecibidoSchema(many=True)
-
-    # def crear_nota_de_entrega(self, data):
-    #     nueva_nota = NotaDeEntrega(nro_orden=data['nro_orden'])
-    #     db.session.add(nueva_nota)
-    #     db.session.commit()
-    #     return self.nota_de_entrega_schema.dump(nueva_nota)
 
     def obtener_todas_las_notas_de_entrega(self):
         notas = NotaDeEntrega.query.all()
@@ -39,140 +30,139 @@ class NotaDeEntregaFacade:
 
         if not nota:
             return {"Error": "No se encontró la nota"}
-        return self.nota_de_entrega_schema.dump(nota)
+        return self.nota_de_entrega_schema.dump(nota)    
 
-    # def crear_entrega_pendiente(self, data):
-    #     nueva_entrega = EntregaPendiente(nro_nota=data['nro_nota'])
-    #     db.session.add(nueva_entrega)
-    #     db.session.commit()
-        
-    #     for detalle in data['detalles']:
-    #         nuevo_detalle = DetalleMaterialPendiente(
-    #             cod_material=detalle['cod_material'],
-    #             cantidad_pendiente=detalle['cantidad_pendiente'],
-    #             descripcion=detalle['descripcion'],
-    #             entrega_pendiente_id=nueva_entrega.id_entrega_pendiente
-    #         )
-    #         db.session.add(nuevo_detalle)
-        
-    #     db.session.commit()
-    #     return self.entrega_pendiente_schema.dump(nueva_entrega)
-
-    # def obtener_todas_las_entregas_pendientes(self):
-    #     entregas = EntregaPendiente.query.all()
-    #     return self.entrega_pendiente_schemas.dump(entregas)
-    
-    def obtener_entrega_pendiente_nro_nota(self, nro_nota):
-        entrega = EntregaPendiente.query.filter_by(nro_nota=nro_nota).first()
-        if not entrega:
-            return {"Error": "No se encontró la entrega pendiente"}
-        return self.entrega_pendiente_schema.dump(entrega)
-
-    # def actualizar_entrega_pendiente(self, id, data):
-    #     entrega = EntregaPendiente.query.get(id)
-    #     if not entrega:
-    #         return {'message': 'EntregaPendiente not found'}, 404
-
-    #     entrega.estado = data.get('estado', entrega.estado)
-    #     entrega.fecha_actualizacion = datetime.now().strftime("%Y-%m-%d")
-
-    #     db.session.commit()
-    #     return self.entrega_pendiente_schema.dump(entrega)
-        
     def agregar_nota_de_entrega(self, nro_orden, materiales_recibidos):
         try:
             orden = OrdenDeCompra.query.get(nro_orden)
             if not orden:
                 return {"Error": "Orden de compra no encontrada"}
 
+            if orden.estado_compra == EstadoCompra.SATISFECHA:
+                return {"Mensaje": "La orden ya fue satisfecha"}
+
+            for material in materiales_recibidos:
+                id_material = material.get('id_material')
+                cantidad_recibida = material.get('cantidad_recibida')
+
+                detalle = next((detalle for detalle in orden.detalles if detalle.id_material == id_material), None)
+                if not detalle:
+                    return {"Error": f"Material ID {id_material} no encontrado en la orden"}
+
+                cantidad_requerida = detalle.cantidad_requerida
+                cantidad_recibida_actual = sum(
+                    m.cantidad_recibida for nota in orden.notas_entrega 
+                    for m in nota.materiales_recibidos 
+                    if m.id_material == id_material
+                )
+
+                if cantidad_recibida > cantidad_requerida:
+                    return {"Error": f"La cantidad recibida de material ID {id_material} excede la cantidad requerida"}
+
+                cantidad_faltante = cantidad_requerida - cantidad_recibida_actual
+                if cantidad_recibida > cantidad_faltante:
+                    return {"Error": f"La cantidad recibida de material ID {id_material} excede la cantidad faltante por recibir"}
+
             nueva_nota = NotaDeEntrega(nro_orden=nro_orden)
             db.session.add(nueva_nota)
             db.session.flush()
 
-            total_diferencia = 0
-            nueva_entrega_pendiente = None
-
             for material in materiales_recibidos:
-                cod_material = material.get('cod_material')
+                id_material = material.get('id_material')
                 cantidad_recibida = material.get('cantidad_recibida')
 
                 nuevo_material_recibido = MaterialRecibido(
-                    cod_material=cod_material,
+                    id_material=id_material,
                     cantidad_recibida=cantidad_recibida,
                     nro_nota=nueva_nota.nro_nota
                 )
+
                 db.session.add(nuevo_material_recibido)
 
-                material_actualizado = Material.query.get(cod_material)
+                # Verificar si los materiales recibidos se están guardando correctamente
+                print(f"Material recibido guardado: {nuevo_material_recibido}")
+
+                material_actualizado = Material.query.get(id_material)
                 if material_actualizado:
                     material_actualizado.existencias += cantidad_recibida
 
-                    # Crear transacción de inventario
                     codigo_transaccion = f"{nuevo_material_recibido.id}-E"
                     nueva_transaccion = TransaccionInventario(
                         codigo_transaccion=codigo_transaccion,
-                        codigo_material=cod_material,
+                        fecha_transaccion=nueva_nota.fecha,
+                        id_material=id_material,
                         descripcion=material_actualizado.descripcion,
                         precio_unitario=material_actualizado.precio_unitario,
-                        fecha_transaccion=nueva_nota.fecha,
                         cantidad_entrada=cantidad_recibida,
                         cantidad_salida=0,
-                        existencia_salida=material_actualizado.existencias
+                        existencia_salida=material_actualizado.existencias,
+                        material_recibido_id=nuevo_material_recibido.id
                     )
                     db.session.add(nueva_transaccion)
 
-                detalle_orden = next((d for d in orden.detalles if d.codigo_material == cod_material), None)
-                if detalle_orden:
-                    diferencia = detalle_orden.cantidad_requerida - cantidad_recibida
-                    total_diferencia += diferencia
-
-                    if diferencia > 0:
-                        if not nueva_entrega_pendiente:
-                            nueva_entrega_pendiente = EntregaPendiente(
-                                fecha_actualizacion=datetime.now().strftime("%Y-%m-%d"),
-                                nro_nota=nueva_nota.nro_nota,
-                                estado=EstadoEntrega.PENDIENTE
-                            )
-                            db.session.add(nueva_entrega_pendiente)
-                            db.session.flush()
-
-                        nuevo_detalle_material_pendiente = DetalleMaterialPendiente(
-                            cod_material=cod_material,
-                            cantidad_pendiente=diferencia,
-                            descripcion=material_actualizado.descripcion,
-                            entrega_pendiente_id=nueva_entrega_pendiente.id_entrega_pendiente
-                        )
-                        db.session.add(nuevo_detalle_material_pendiente)
-
-            if nueva_entrega_pendiente and total_diferencia == 0:
-                nueva_entrega_pendiente.estado = EstadoEntrega.ENTREGADO
+            db.session.flush()
+            self._actualizar_estado_orden(orden, nueva_nota)
 
             db.session.commit()
-            nueva_transaccion.codigo_transaccion = f"{nueva_nota.nro_nota}-E"
-
             return self.nota_de_entrega_schema.dump(nueva_nota)
-        
+
         except SQLAlchemyError as e:
             db.session.rollback()
             return {"Error": str(e)}
         
-        #         if diferencia > 0:
-            #             if not nueva_entrega_pendiente:
-            #                 nueva_entrega_pendiente = EntregaPendiente(
-            #                     fecha_actualizacion=datetime.now().strftime("%Y-%m-%d"),
-            #                     nro_nota=nueva_nota.nro_nota,
-            #                     estado=EstadoEntrega.PENDIENTE
-            #                 )
-            #                 db.session.add(nueva_entrega_pendiente)
-            #                 db.session.flush()
+    def _actualizar_estado_orden(self, orden, nota_actual):
+        todos_materiales_completos = True
 
-            #             nuevo_detalle_material_pendiente = DetalleMaterialPendiente(
-            #                 cod_material=cod_material,
-            #                 cantidad_pendiente=diferencia,
-            #                 descripcion=material_actualizado.descripcion,
-            #                 entrega_pendiente_id=nueva_entrega_pendiente.id_entrega_pendiente
-            #             )
-            #             db.session.add(nuevo_detalle_material_pendiente)
+        for detalle in orden.detalles:
+            cantidad_requerida = detalle.cantidad_requerida
+            cantidad_recibida = sum(material.cantidad_recibida for material in nota_actual.materiales_recibidos if material.id_material == detalle.id_material)
 
-            # if nueva_entrega_pendiente and total_diferencia == 0:
-            #     nueva_entrega_pendiente.estado = EstadoEntrega.ENTREGADO
+            # Verificar la cantidad recibida para cada material
+            print(f"Material ID {detalle.id_material}: cantidad requerida = {cantidad_requerida}, cantidad recibida = {cantidad_recibida}")
+
+            if cantidad_recibida < cantidad_requerida:
+                todos_materiales_completos = False
+                print(f"Falta recibir materiales para el detalle del material ID {detalle.id_material}.")
+                break
+
+            # Actualizar el estado de la orden inmediatamente
+            if todos_materiales_completos:
+                orden.estado_compra = EstadoCompra.SATISFECHA
+                print(f"Todos los materiales están completos. Orden {orden.nro_orden} satisfecha.")
+            else:
+                orden.estado_compra = EstadoCompra.PARCIALMENTE_SATISFECHA
+                print(f"Faltan materiales por recibir. Orden {orden.nro_orden} parcialmente satisfecha.")
+
+        # Actualizar el estado de la orden en la base de datos
+        db.session.add(orden)
+        db.session.flush()
+
+    def eliminar_nota_de_entrega(self, nro_nota):
+        try:
+            nota = NotaDeEntrega.query.get(nro_nota)
+            if not nota:
+                return {"Error": "Nota de entrega no encontrada"}
+
+            orden = nota.orden_de_compra
+
+            for material_recibido in nota.materiales_recibidos:
+                material = Material.query.get(material_recibido.id_material)
+                if material:
+                    material.existencias -= material_recibido.cantidad_recibida
+
+                transaccion = TransaccionInventario.query.filter_by(material_recibido_id=material_recibido.id).first()
+                if transaccion:
+                    db.session.delete(transaccion)
+
+                db.session.delete(material_recibido)
+
+            db.session.delete(nota)
+            db.session.flush()
+            self._actualizar_estado_orden(orden)
+
+            db.session.commit()
+            return {"Mensaje": "Nota de entrega eliminada correctamente"}
+        
+        except SQLAlchemyError as e:
+            db.session.rollback()
+            return {"Error": str(e)}

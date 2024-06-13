@@ -20,15 +20,15 @@ class Recibo(db.Model):
     cuenta_por_cobrar = db.relationship('CuentaPorCobrar', back_populates='recibos')
 
     # Relación muchos a uno con Empleado
-    empleado_id = Column(Integer, ForeignKey('empleados.codigo_empleado'))
+    empleado_id = Column(Integer, ForeignKey('empleados.ID_empleado'))
     empleado = db.relationship('Empleado', back_populates='recibos')
 
     # Relación uno a uno con Deposito
-    deposito_id = Column(Integer, ForeignKey('depositos.nro_deposito'), unique=True, nullable=True)
+    deposito_id = Column(Integer, ForeignKey('depositos.nro_deposito'), nullable=True)
     deposito = db.relationship('Deposito', back_populates='recibo')
 
     # Relacion muchos a uno con Proyecto
-    numero_proyecto = Column(Integer, ForeignKey('proyectos.numero_proyecto'))
+    numero_proyecto = Column(Integer, ForeignKey('proyectos.nro_proyecto'))
     proyecto = db.relationship('Proyecto', back_populates='recibos')
 
     def __init__(self, ci_cliente, monto, cuenta_por_cobrar_id, empleado_id, deposito_id, numero_proyecto):
@@ -43,6 +43,6 @@ class Recibo(db.Model):
 class ReciboSchema(ma.Schema):
     empleado = fields.Nested(EmpleadoSchema, only=('nombre_empleado', 'apellido_empleado', 'codigo_empleado'))
     proyecto = fields.Nested(ProyectoSchema, only=('numero_proyecto',))
-    cuenta_por_cobrar = fields.Nested(CuentaPorCobrarRecibo)
+    cuenta_por_cobrar = fields.Nested(CuentaPorCobrarRecibo, only=('nro_cuenta',))
     class Meta():
-        fields = ("nro_recibo", "fecha", "ci_cliente", "monto", "empleado", "proyecto", "cuenta_por_cobrar")
+        fields = ("nro_recibo", "fecha", "ci_cliente", "monto", "empleado", "proyecto", "cuenta_por_cobrar", 'deposito_id')

@@ -1,7 +1,7 @@
 from flask import request
 from sqlalchemy.exc import SQLAlchemyError
 from app import db
-from models.banco.deposito import Deposito, DepositoSchema, FormaPago
+from models.banco.deposito import Deposito, DepositoSchema, FormaPago, DepositoRecibosSchema
 from models.cliente.recibo import Recibo
 from datetime import datetime
 from decimal import Decimal
@@ -12,6 +12,12 @@ class DepositoFacade:
         self.deposito_schema = DepositoSchema()
         self.depositos_schema = DepositoSchema(many=True)
         self.recibo_facade = ReciboFacade()
+        self.deposito_recibo_schema = DepositoRecibosSchema()
+        self.deposito_recibo_schemas = DepositoRecibosSchema(many=True)
+
+    def get_depositos(self):
+        consulta = Deposito.query.all()
+        return self.deposito_recibo_schemas.dump(consulta)
 
     def crear_deposito(self, cuenta, fecha, monto, banco_id, forma_pago):
         try:
@@ -22,8 +28,10 @@ class DepositoFacade:
                 banco_id=banco_id,
                 forma_pago=FormaPago[forma_pago]  # Asegura que el valor de forma_pago sea una opción válida
             )
+
             db.session.add(nuevo_deposito)
             db.session.commit()
+            
             return self.deposito_schema.dump(nuevo_deposito)
         
         except SQLAlchemyError as e:
@@ -72,6 +80,41 @@ class DepositoFacade:
                 db.session.commit()
                 return self.deposito_schema.dump(nuevo_deposito)
             
+        except SQLAlchemyError as e:
+            db.session.rollback()
+            return {"Error": str(e)}
+    
+    '''
+        Generar un deposito con una lista de recibos
+    '''
+    def crear_deposito_recibos(self, recibos, cuenta, banco_id, forma_pago):
+        
+        try:
+            monto_total = sum(Decimal(recibo['monto']) for recibo in recibos)
+            fecha = datetime.now().strftime("%Y-%m-%d")
+
+            nuevo_deposito = Deposito(
+                    cuenta=cuenta,
+                    fecha=fecha,
+                    monto=monto_total,
+                    banco_id=banco_id,
+                    forma_pago=FormaPago[forma_pago]  # Asegura que el valor de forma_pago sea una opción válida
+            )
+        
+            db.session.add(nuevo_deposito)
+            db.session.flush()
+
+            for recibo_data in recibos:
+                recibo_id = recibo_data['nro_recibo'] 
+                recibo = Recibo.query.get(recibo_id)
+                if recibo:
+                    recibo.deposito_id = nuevo_deposito.nro_deposito
+                    db.session.add(recibo)
+
+            db.session.commit()
+
+            return self.deposito_recibo_schema.dump(nuevo_deposito)
+        
         except SQLAlchemyError as e:
             db.session.rollback()
             return {"Error": str(e)}

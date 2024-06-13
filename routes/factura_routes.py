@@ -1,12 +1,14 @@
 from .cliente_routes import cliente_bp
 
 from flask_cors import cross_origin
-from flask import jsonify, request
+from flask import jsonify, request, Blueprint
 
 from models.proyecto import Proyecto
 
 from services.facades.factura_cliente_facade import FacturaClienteFacade
 from models.cliente.factura_cliente import FacturaCliente, FacturaSchema
+
+factura_cliente_bp = Blueprint('factura_cliente', __name__)
 
 factura_schema = FacturaSchema()
 factura_schemas = FacturaSchema(many=True)
@@ -14,7 +16,7 @@ factura_facade = FacturaClienteFacade()
 #CREAR LA FACTURA CLIENTE
 #SE NECESITA EL NUMERO DE PROYECTO PARA GENERAR LA FACTURA
 
-@cliente_bp.route("/cliente/factura/crear_factura/<int:nro_proyecto>", methods=['GET'])
+@factura_cliente_bp.route("/factura/crear_factura/<int:nro_proyecto>", methods=['GET'])
 def crear_factura(nro_proyecto):
     proyecto = Proyecto.query.get(nro_proyecto)
     
@@ -28,7 +30,7 @@ def crear_factura(nro_proyecto):
 
 #OBTENER FACTURAS
 
-@cliente_bp.route("/cliente/factura/", methods=['GET'])
+@factura_cliente_bp.route("/facturas_cliente", methods=['GET'])
 def obtener_factura():
 
     facturas = factura_facade.get_facturas()
@@ -38,7 +40,7 @@ def obtener_factura():
 
 #OBTENER FACTURAS POR CLIENTE
 
-@cliente_bp.route("/cliente/factura/<int:id_cliente>", methods=['GET'])
+@factura_cliente_bp.route("/cliente/factura/<int:id_cliente>", methods=['GET'])
 def obtener_factura_cliente(id_cliente):
     
     factura = FacturaCliente.query.filter_by(cliente_id=id_cliente).first()

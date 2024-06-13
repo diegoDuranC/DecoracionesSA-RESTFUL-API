@@ -12,9 +12,10 @@ recibo_facade = ReciboFacade()
 
 #RUTA DE PRUEBA
 
-@recibo_bp.route("/recibo", methods=['GET'])
-def inicio():
-    return "INICIO RECIBOS"
+@recibo_bp.route("/recibos", methods=['GET'])
+def obtener_todos_recibos():
+    result = recibo_facade.obtener_recibos()
+    return jsonify(result)
 
 #GENERA UN RECIBO
 #NECESITA

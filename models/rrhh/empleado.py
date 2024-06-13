@@ -1,35 +1,26 @@
 from app import db, ma
-from .cargo import Cargo
-from .area import Area
-from .area import AreaSchema
+from marshmallow import fields
 from .cargo import CargoSchema
+'''
+    Agregar Cargo
+'''
 
 class Empleado(db.Model):
     __tablename__ = 'empleados'
     
-    codigo_empleado = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    ci_empleado = db.Column(db.String(7), unique=True, nullable=False)
-    nombre_empleado = db.Column(db.String(80), nullable=False)
-    apellido_empleado = db.Column(db.String(80), nullable=False)
-    telefono_empleado = db.Column(db.String(8), unique=True)
-    fecha_contratacion = db.Column(db.Date(), nullable=False)
-    fecha_despido = db.Column(db.Date(), nullable=True)
-    jefe_id = db.Column(db.Integer, db.ForeignKey(codigo_empleado), nullable=True)
-    cargo_id = db.Column(db.Integer, db.ForeignKey(Cargo.id_cargo))
-    area_id = db.Column(db.Integer, db.ForeignKey(Area.id_area))
-
-    #RELACIONES
-    #JEFE Relación recursiva: Un empleado tiene un jefe   
-    jefe = db.relationship('Empleado', remote_side=[codigo_empleado], back_populates='subordinados')
-
-    #Relación recursiva inversa: Un jefe tiene subordinados
-    subordinados = db.relationship('Empleado', back_populates='jefe')
+    ID_empleado = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    cod_empleado = db.Column(db.String(20), nullable=False, unique=True)
+    ci = db.Column(db.String(7), unique=True, nullable=False)
+    nombre = db.Column(db.String(80), nullable=False)
+    apellido = db.Column(db.String(80), nullable=False)
+    telefono = db.Column(db.String(8), unique=True)
+    departamento_id = db.Column(db.Integer, db.ForeignKey("departamentos.ID_departamento"))
   
     #Relación uno a uno con Area
-    area = db.relationship('Area', back_populates='empleado')
+    departamento = db.relationship('Departamento', back_populates='empleados')
 
-    # Relación uno a uno con Cargo
-    cargo = db.relationship('Cargo', back_populates='empleado')
+    cargo_id = db.Column(db.Integer, db.ForeignKey("cargos.id_cargo"))
+    cargo = db.relationship('Cargo', back_populates='empleado', uselist=False)
 
     # Relación con deposito
     depositos = db.relationship('Deposito', back_populates='empleado')
@@ -42,45 +33,37 @@ class Empleado(db.Model):
 
     def __init__(
                     self,
-                    ci_empleado, 
-                    nombre_empleado,
-                    apellido_empleado,
-                    telefono_empleado,
-                    fecha_contratacion,
-                    fecha_despido,
+                    cod_empleado,
+                    ci, 
+                    nombre,
+                    apellido,
+                    telefono,
                     cargo_id,
-                    area_id,
-                    jefe_id = None
+                    departamento_id,
                 ):
         
-        self.ci_empleado = ci_empleado
-        self.nombre_empleado = nombre_empleado
-        self.apellido_empleado = apellido_empleado
-        self.telefono_empleado = telefono_empleado
+        self.cod_empleado = cod_empleado
+        self.ci = ci
+        self.nombre = nombre.upper()
+        self.apellido = apellido.upper()
+        self.telefono = telefono
         self.cargo_id = cargo_id
-        self.area_id = area_id
-        self.jefe_id = jefe_id
-        self.fecha_contratacion = fecha_contratacion
-        self.fecha_despido = fecha_despido
+        self.departamento_id = departamento_id
     
     def __repr__(self):
-        return f"Empleado(codigo_empleado={self.codigo_empleado}, nombre_empleado='{self.nombre_empleado}', apellido_empleado='{self.apellido_empleado}', telefono_empleado='{self.telefono_empleado}', cargo_empleado='{self.cargo_empleado}', area_empleado='{self.area_empleado}')"
+        return f"Empleado(codigo_empleado={self.cod_empleado}, nombre_empleado='{self.nombre}', apellido_empleado='{self.apellido}', telefono_empleado='{self.telefono}', cargo_empleado='{self.cargo}', departamento_empleado='{self.departamento_id}')"
 
 class EmpleadoSchema(ma.Schema):
-
-    cargo = ma.Nested(CargoSchema)
-    area = ma.Nested(AreaSchema)
-    jefe = ma.Nested('self', only=('codigo_empleado', 'nombre_empleado', 'apellido_empleado'))
-
-    class Meta:
-        
+    cargo = fields.Nested(CargoSchema)
+    class Meta: 
         fields = (
-            'codigo_empleado', 'ci_empleado', 'nombre_empleado', 'apellido_empleado', 
-            'telefono_empleado', 'fecha_contratacion', 'fecha_despido', 'cargo', 'area', 'jefe'
+            'ID_empleado', 'cod_empleado', 'ci', 'nombre', 'apellido', 
+            'telefono', 'cargo', 'departamento_id'
         )
         
 class EmpleadoRequisicionSchema(ma.Schema):
     model = Empleado
+    cargo = fields.Nested(CargoSchema)
     class Meta():
-        fields = ('nombre_empleado', 'apellido_empleado')
+        fields = ('nombre', 'apellido', 'cargo')
 

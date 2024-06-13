@@ -6,7 +6,7 @@ class DetalleFactura(db.Model):
 
     id = Column(Integer, autoincrement=True, primary_key=True)
     nro_factura = Column(Integer, ForeignKey("facturas_cliente.nro_factura"))
-    cod_material = Column(Integer, ForeignKey("materiales.codigo_material"))
+    cod_material = Column(Integer, ForeignKey("materiales.ID_material"))
     nombre_material = Column(String(255))
     precio_unitario = Column(Float)
     cantidad = Column(Float)

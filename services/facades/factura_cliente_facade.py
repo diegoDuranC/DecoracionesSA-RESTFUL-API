@@ -80,7 +80,8 @@ class FacturaClienteFacade():
         return factura
     
     def get_facturas(self):
-        return FacturaCliente.query.all()
+        consulta = FacturaCliente.query.all()
+        return consulta
 
     def get_facturas_cliente(self, cliente_id):
         return FacturaCliente.query.filter_by(cliente_id=cliente_id)

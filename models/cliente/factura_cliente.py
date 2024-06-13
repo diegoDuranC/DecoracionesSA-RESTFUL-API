@@ -24,10 +24,10 @@ class FacturaCliente(db.Model):
         CLIENTE
         CUENTA POR COBRAR
     '''
-    cliente_id = Column(Integer, ForeignKey("clientes.id_cliente"))
+    cliente_id = Column(Integer, ForeignKey("clientes.ID_cliente"))
     cliente = db.relationship('Cliente', back_populates='facturas')
 
-    proyecto_id = Column(Integer, ForeignKey("proyectos.numero_proyecto"))
+    proyecto_id = Column(Integer, ForeignKey("proyectos.nro_proyecto"))
     proyecto = db.relationship('Proyecto', back_populates='factura')
 
     detalles = db.relationship('DetalleFactura', back_populates='factura')

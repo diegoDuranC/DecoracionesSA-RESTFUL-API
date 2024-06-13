@@ -75,6 +75,10 @@ class ReciboFacade():
 
         return self.recibo_schema.dump(nuevo_recibo)
 
+    def obtener_recibos(self):
+        consulta = Recibo.query.all()
+        return self.recibo_schemas.dump(consulta)
+
     def obtener_recibos_por_fecha(self, fecha_inicio, fecha_fin):
         '''
             Retorna una lista con instancias de recibos en un intervalo de fechas

@@ -14,7 +14,10 @@ clientes_schema = ClienteSchema(many=True)
 @cliente_bp.route("/cliente", methods=['POST'])
 def create():
     result = cliente_controller.create_cliente()
-    return cliente_schema.jsonify(result)
+    if result is True:
+        return jsonify({"Mensaje" : "Creado"}), 201
+    
+    return jsonify(result)
 
 #OBTENER CLIENTE CI
 #Enviar en los Query Params
@@ -23,13 +26,13 @@ def create():
 @cliente_bp.route("/cliente/ci", methods=['GET'])
 def obtener_cliente_ci():
 
-    ci_cliente = request.args.get('ci_cliente')
+    ci_cliente = request.args.get('ci')
     result = cliente_controller.get_cliente_ci(ci_cliente)
-
-    if not result:
-        return jsonify({'error': 'Cliente no encontrado'}), 404
     
-    return cliente_schema.jsonify(result)
+    if result is False:
+        return jsonify({"Error" : "cliente no encontrado"}), 404
+    
+    return jsonify(result)
 
 #OBTENER CLIENTE POR ID
 
@@ -47,9 +50,8 @@ def obtener_cliente_id(id_cliente):
 @cliente_bp.route("/clientes", methods=['GET'])
 def obtener_clientes():
     results = cliente_controller.get_clientes()
-    clientes_schema.dump(results)
 
-    return clientes_schema.jsonify(results)
+    return jsonify({"clientes" : results})
 
 # #ACTUALIZAR PARCIALMENTE "PUT"
 

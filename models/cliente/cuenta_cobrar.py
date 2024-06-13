@@ -11,7 +11,7 @@ class CuentaPorCobrar(db.Model):
     __tablename__ = "cuentas_por_cobrar"
 
     nro_cuenta = Column(Integer, primary_key=True, autoincrement=True)
-    id_cliente = Column(Integer, ForeignKey("clientes.id_cliente"))
+    id_cliente = Column(Integer, ForeignKey("clientes.ID_cliente"))
     importe = Column(Numeric(8,2))
     saldo = Column(Numeric(8,2))
     fecha_creacion = Column(Date)
@@ -50,4 +50,4 @@ class EstadoCuentaSchema(ma.Schema):
 class CuentaPorCobrarRecibo(ma.Schema):
     factura = fields.Nested(FacturaSchema, only=("nro_factura",))
     class Meta():
-        fields = ()
+        fields = ("nro_cuenta",)

@@ -1,32 +1,42 @@
-'''
-    MODELO QUE REPRESENTA LA ORDEN DE COMPRA DE MATERIAL A UN PROVEEDOR, INCLUYE LA TABLA ASOCIATIVA RESULTANTE DE LA RELACIÓN MUCHOS A MUCHOS CON MATERIAL,
-    JUNTO CON LA ENTIDAD DÉBIL DE LA NOTA DE ENTREGA DEL MATERIAL SOLICITADO, POR PARTE DEL PROVEEDOR Y LA FACTURA QUE SE GENERA POR LA COMPRA DE DICHA ORDEN
-'''
-
 from app import db, ma
-from sqlalchemy import Column, Integer, Text, Date
+from sqlalchemy import Column, Integer, Text, Date, String, Enum as SqlEnum
 from datetime import datetime
+from enum import Enum
 from marshmallow import fields
 
-from models.compras.detalle_orden import DetalleOrdenCompraSchema
+class EstadoCompra(Enum):
+    SATISFECHA = "SATISFECHA"
+    PENDIENTE = "PENDIENTE"
+    CANCELADA = "CANCELADA"
+    EN_PROCESO = "EN_PROCESO"
+    PARCIALMENTE_SATISFECHA = "PARCIALMENTE_SATISFECHA"
+    RECHAZADA = "RECHAZADA"
 
 class OrdenDeCompra(db.Model):
     __tablename__ = "ordenes_de_compra"
 
     nro_orden = Column(Integer, primary_key=True, autoincrement=True)
-    fecha = Column(Date)
-    descripcion = Column(Text, nullable=True)
+    descripcion = Column(Text(255), nullable=False)
+    cod_orden = Column(String(20), nullable=False)
+    estado_compra = Column(SqlEnum(EstadoCompra), default=EstadoCompra.PENDIENTE, nullable=False)
+    fecha = Column(Date, default=datetime.now().strftime("%Y-%m-%d"))
 
     # RELACIONES
     factura = db.relationship('FacturaOrdenCompra', back_populates='orden_de_compra', uselist=False)
     notas_entrega = db.relationship('NotaDeEntrega', back_populates='orden_de_compra')
-    detalles = db.relationship('DetalleOrdenCompra', back_populates='orden')  # Relación definida
+    detalles = db.relationship('DetalleOrdenCompra', back_populates='orden')
 
-    def __init__(self, descripcion):
-        self.fecha = datetime.now().strftime("%Y-%m-%d")
+    def __init__(self, descripcion, cod_orden, fecha=datetime.now().strftime("%Y-%m-%d")):
         self.descripcion = descripcion
+        self.cod_orden = cod_orden
+        self.fecha = fecha
 
 class OrdenDeCompraSchema(ma.Schema):
-    detalles = fields.List(fields.Nested(DetalleOrdenCompraSchema, exclude=("nro_orden",)))
+    detalles = fields.List(fields.Nested('DetalleOrdenCompraSchema', exclude=("nro_orden",)))
+    estado_compra = fields.Method("get_estado_compra")
+    
     class Meta:
-        fields = ("nro_orden", "fecha", "descripcion", "detalles")
+        fields = ("nro_orden", "cod_orden", "fecha", "detalles", "descripcion", "estado_compra")
+
+    def get_estado_compra(self,obj):
+        return obj.estado_compra.value

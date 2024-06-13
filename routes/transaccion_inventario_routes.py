@@ -80,8 +80,8 @@ Ejemplo solicitud
 '''
 # Actualizar una transacción de inventario por su ID
 
-@transaccion_inventario_bp.route("/transaccion_inventario/<int:id>", methods=['PUT'])
-def actualizar_transaccion_inventario(id):
-    data = request.get_json()
-    result = transaccion_inventario_facade.actualizar_transaccion(id, data)
-    return jsonify(result)
+# @transaccion_inventario_bp.route("/transaccion_inventario/<int:id>", methods=['PUT'])
+# def actualizar_transaccion_inventario(id):
+#     data = request.get_json()
+#     result = transaccion_inventario_facade.actualizar_transaccion(id, data)
+#     return jsonify(result)

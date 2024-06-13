@@ -1,73 +1,70 @@
-from flask import Blueprint, jsonify
+from flask import Blueprint, jsonify, request
 from controllers.empleado_controller import EmpleadoController
-from models.rrhh.empleado import EmpleadoSchema
-from flask_cors import cross_origin
 
 empleado_bp = Blueprint('empleado', __name__)
 empleado_controller = EmpleadoController()
 
-empleado_schema = EmpleadoSchema()
-empleado_schemas = EmpleadoSchema(many=True)
-
+# EJEMPLO CUERPO JSON
 '''
     {
-        "ci_empleado": "3087096",
-        "nombre_empleado": "Luis",
-        "apellido_empleado": "Lopez Alvarado",
-        "telefono_empleado": "73274099",
-        "fecha_contratacion": "2018-02-12",
-        "fecha_despido": null o "YYYY-mm-dd"
-        "cargo_id": 9,  
-        "area_id": 11,  
-        "jefe_id": 4  
+        "ci": "3087096",
+        "cod_empleado": "VEN-3087096"
+        "nombre": "Luis",
+        "apellido": "Lopez Alvarado",
+        "telefono": "73274099",
+        "cargo_id": 3,  
+        "departamento_id": 11, 
     }
 '''
-
 
 @empleado_bp.route("/empleado", methods=['POST'])
 def crear():
-    empleado = empleado_controller.create_empleado()
+    query = empleado_controller.create_empleado()
 
-    # if not empleado:
-    #     return 404
+    if query is True:
+        return jsonify({"Mensaje" : "Empleado creado"}), 201
     
-    return empleado_schema.jsonify(empleado)
+    return jsonify(query)
 
 '''
     {
-        "ci_empleado": "3087096",
-        "nombre_empleado": "Luis",
-        "apellido_empleado": "Lopez Alvarado",
-        "telefono_empleado": "73274099",
-        "fecha_contratacion": "2018-02-12",
-        "fecha_despido": null o "YYYY-mm-dd"
-        "cargo_id": 9,  
-        "area_id": 11,  
-        "jefe_id": 4  
+        "ci": "3087096",
+        "nombre": "Luis",
+        "apellido": "Lopez Alvarado",
+        "telefono": "73274099",
+        "cargo": "Ayudante",
+        "departamento_id": 1  
     }
 '''
-
-
-@empleado_bp.route("/empleado/<int:id_empleado>", methods=['PUT'])
-def actualizar_campos(id_empleado):
-    updated_empleado = empleado_controller.update_empleado(id_empleado)
-
-    if updated_empleado is None: 
-        return jsonify({'error': 'Cargo no encontrado o actualización fallida'}), 404
-    
-    return empleado_schema.jsonify(updated_empleado)
-
 
 @empleado_bp.route("/empleado/<int:id_empleado>", methods=['GET'])
 def obtener_empleado(id_empleado):
     result = empleado_controller.get_empleado(id_empleado)
 
-    return empleado_schema.jsonify(result)
-
+    return jsonify(result)
 
 @empleado_bp.route("/empleados", methods=['GET'])
 def obtener_empleados():
     results = empleado_controller.get_empleados()
-    empleado_schemas.dump(results)
 
-    return empleado_schemas.jsonify(results)
+    return jsonify({"empleados" : results})
+
+@empleado_bp.route("/empleado/ci", methods=['GET'])
+def obtener_empleado_ci():
+    ci = request.args.get("ci")
+    result = empleado_controller.get_empleado_ci(ci=ci)
+    return jsonify(result)
+
+@empleado_bp.route("/empleado/<int:ID_empleado>", methods=['PUT'])
+def actualizar_campos(ID_empleado):
+    result = empleado_controller.update_empleado(ID_empleado)
+    
+    return jsonify(result)
+
+@empleado_bp.route("/empleado/<int:ID_empleado>", methods=['DELETE'])
+def eliminar_empleado(ID_empleado):
+    result = empleado_controller.delete_empleado(ID_empleado)
+    if result is True:
+        return jsonify({"Mensaje" : "Empleado eliminado"}), 200
+    
+    return jsonify(result)

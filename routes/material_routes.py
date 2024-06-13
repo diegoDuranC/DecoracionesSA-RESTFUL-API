@@ -24,17 +24,28 @@ def inicio():
     return "INICIO"
 
 #CREAR MATERIAL
+'''
+    {
+    "cod_material" : "PRUEBA",
+    "descripcion": "PRUEBA",
+    "existencias": 150,
+    "precio_unitario": 20
+    }
+'''
 
 @material_bp.route("/material", methods=['POST'])
 def create():
     result = material_controller.create_material()
-    return material_schema.jsonify(result)
+    if result is True:
+        return jsonify({"Mensaje" : "Creado"}), 201
+    
+    return jsonify(result)
 
 #OBTENER MATERIAL
 
-@material_bp.route("/material/<int:codigo_material>", methods=['GET'])
-def obtener_material(codigo_material):
-    result = material_controller.get_material(codigo_material)
+@material_bp.route("/material/<int:id_material>", methods=['GET'])
+def obtener_material(id_material):
+    result = material_controller.get_material(id_material)
     
     if not result:
         return jsonify({'error': 'Material no encontrado'}), 404
@@ -46,41 +57,62 @@ def obtener_material(codigo_material):
 @material_bp.route("/materiales", methods=['GET'])
 def obtener_materiales():
     results = material_controller.get_materiales()
-    materials_schema.dump(results)
-
-    return materials_schema.jsonify(results)
+    if not materials_schema.dump(results):
+        return jsonify({"Mensaje" : "No hay materiales"})
+    return jsonify({"materiales" : materials_schema.dump(results)})
 
 #ACTUALIZAR PARCIALMENTE "PUT"
 
-@material_bp.route("/material/<int:codigo_material>", methods=['PUT'])
-def actualizar_campos(codigo_material):
-    updated_material = material_controller.update_material(codigo_material)
+'''
+    cuerpo
+    {
+    "cod_material" : "ACT-PRUEBA",
+    "descripcion": "ACT PRUEBA",
+    "existencias": 1,
+    "precio_unitario": 1
+    }
+'''
+
+@material_bp.route("/material/<int:id_material>", methods=['PUT'])
+def actualizar_campos(id_material):
+    updated_material = material_controller.update_material(id_material)
 
     if updated_material is None:
         return jsonify({'error': 'Material not found or update failed'}), 404
 
     return material_schema.jsonify(updated_material)
 
+'''
+    Response
+    {
+    "ID_material": 7,
+    "cod_material": "ACT-PRUEBA",
+    "descripcion": "ACT PRUEBA",
+    "existencias": 1.0,
+    "precio_unitario": 1.0
+    }
+'''
+
 #ELIMINAR
 
-@material_bp.route("/material/<int:codigo_material>", methods=['DELETE'])
-def eliminar_material(codigo_material):
-    deleted_material = material_controller.delete_material(codigo_material)
+@material_bp.route("/material/<int:material_id>", methods=['DELETE'])
+def eliminar_material(material_id):
+    deleted_material = material_controller.delete_material(material_id)
 
     if deleted_material is None:
         return jsonify({'error': 'Material not found or update failed'}), 404
     
-    return material_schema.jsonify(deleted_material)
+    return jsonify({"Mensaje" : "Eliminado"}), 200
 
 #DETALLE
-
+#OBTIENE TODOS LOS DETALLES
 @material_bp.route("/material/detalle_material", methods=['GET'])
 def get_detalles():
     result = detalle_controller.get_detalles()
     result = detalle_material_schemas.dump(result)
     return jsonify(result)
 
-
+#Detalles de una requisicion por su numero de requisicion
 @material_bp.route("/material/detalle_material/<int:nro_requisicion>", methods=['GET'])
 def get_detalles_requisicion(nro_requisicion):
     result = detalle_controller.get_detalles_requisicion(nro_requisicion)
@@ -88,11 +120,11 @@ def get_detalles_requisicion(nro_requisicion):
     return jsonify(result)
 
 
-@material_bp.route("/material/detalle_material/<int:nro_requisicion>/<int:id_detalle>/<int:cod_material>", methods=['PUT'])
-def actualizar_campos_detalle(id_detalle, nro_requisicion, cod_material):
-    updated = detalle_controller.actualizar_detalle(id_detalle, nro_requisicion, cod_material)
+# @material_bp.route("/material/detalle_material/<int:nro_requisicion>/<int:id_detalle>/<int:cod_material>", methods=['PUT'])
+# def actualizar_campos_detalle(id_detalle, nro_requisicion, cod_material):
+#     updated = detalle_controller.actualizar_detalle(id_detalle, nro_requisicion, cod_material)
 
-    if updated is None:
-        return jsonify({'error': 'No se pudo actualizar el detalle'})
+#     if updated is None:
+#         return jsonify({'error': 'No se pudo actualizar el detalle'})
     
-    return detalle_material_schema.dump(updated)
+#     return detalle_material_schema.dump(updated)

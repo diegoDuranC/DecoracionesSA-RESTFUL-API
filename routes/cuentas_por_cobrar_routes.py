@@ -9,7 +9,17 @@ cuenta_por_cobrar_facade = CuentaPorCobrarClienteFacade()
 
 #GENERAR LAS CUENTAS POR COBRAR
 #Necesita el nro de factura (id de factura)
+#SE ENVIA UN SILENT CUANDO EL CLIENTE VA A PAGAR CON EFECTIVO, ES DECIR, UN ÚNICO PAGO
+"""
+    Ejemplo del body para hacer un plan de pago mensual
 
+    {
+        "vencimiento": "2024-12-31",  # Fecha de vencimiento del plan de pagos
+        "intervalo_pago_dias": 30      # Intervalo de pago en días (mensual)
+    }
+
+    Si no se envía un json, quiere decir que se pagará ese mismo momento, al contado y la fecha de la cuenta tomará la fecha de la factura
+"""
 @cuenta_cobrar_bp.route("/cuenta_cobrar/generar_cuenta/<int:nro_factura>", methods=['POST'])
 def generar_cuenta_por_cobrar(nro_factura):
     
@@ -20,7 +30,6 @@ def generar_cuenta_por_cobrar(nro_factura):
 
 #OBTENER LAS CUENTAS DE UN CLIENTE
 #Necesita el id del cliente (id de factura)
-
 @cuenta_cobrar_bp.route("/cuenta_cobrar/<int:id_cliente>", methods=['GET'])
 def obtener_estados_cliente(id_cliente):
 
@@ -55,3 +64,9 @@ def obtener_cuentas_ci():
 def estado_cuenta(nro_cuenta):
     estado = cuenta_por_cobrar_facade.generar_estado_cuenta(nro_cuenta)
     return jsonify(estado)
+
+#ELIMINAR LA CUENTA Y SUS PAGOS
+@cuenta_cobrar_bp.route("/cuenta_cobrar/<int:nro_cuenta>", methods=['DELETE'])
+def eliminar_cuenta(nro_cuenta):
+    cuenta = cuenta_por_cobrar_facade.eliminar_cuenta_pagos(nro_cuenta)
+    return jsonify(cuenta)

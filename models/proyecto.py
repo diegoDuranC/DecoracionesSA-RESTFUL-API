@@ -2,7 +2,7 @@ from app import db, ma
 from sqlalchemy import Column, Integer, Numeric, String, ForeignKey, Text
 from .rrhh.empleado import EmpleadoRequisicionSchema, EmpleadoSchema
 from .cliente.cliente import ClienteSchema
-from marshmallow_sqlalchemy import fields
+from marshmallow import fields
 
 class Proyecto(db.Model):
     
@@ -38,11 +38,12 @@ class Proyecto(db.Model):
 
 
 class ProyectoSchema(ma.Schema): 
-    encargado = ma.Nested(EmpleadoSchema, only=('nombre', 'apellido', 'cargo' ,'cod_empleado'))
-    cliente = ma.Nested(ClienteSchema,only=('ID_cliente', 'nombre_cliente', 'apellido_cliente'))
+    encargado = fields.Nested(EmpleadoSchema, only=('nombre', 'apellido', 'cargo' ,'cod_empleado'))
+    cliente = fields.Nested(ClienteSchema,only=('ID_cliente', 'nombre_cliente', 'apellido_cliente'))
+    requisiciones = fields.List(fields.Nested('RequisicionSchema', exclude=('proyecto',)))
 
     class Meta():
-        fields = ('nro_proyecto', 'cod_proyecto','nombre_proyecto','descripcion_proyecto', 'cliente', 'encargado')
+        fields = ('nro_proyecto', 'cod_proyecto','nombre_proyecto','descripcion_proyecto', 'cliente', 'encargado', 'requisiciones')
 
 class ProyectoRequisicionSchema(ma.Schema):
     encargado = fields.Nested(EmpleadoRequisicionSchema)

@@ -23,7 +23,7 @@ def obtener_todos_recibos():
                 Crea un recibo en base al siguiente json
             {
                 "nro_cuenta" : int() -> nro_cuenta a la cual se le hara el recibo,
-                "monto" : float(), decimal() -> monto a pagar,
+                "monto" : float(), decimal() -> monto que se cobró,
             }
 '''
 

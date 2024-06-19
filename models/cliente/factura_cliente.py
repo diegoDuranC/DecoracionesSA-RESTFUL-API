@@ -18,12 +18,6 @@ class FacturaCliente(db.Model):
     direccion_envio = Column(String(255), nullable=False)
     total = Column(Numeric(8,2), default=0)
     
-    #TABLAS CONECTADAS
-    '''
-        PROYECTO
-        CLIENTE
-        CUENTA POR COBRAR
-    '''
     cliente_id = Column(Integer, ForeignKey("clientes.ID_cliente"))
     cliente = db.relationship('Cliente', back_populates='facturas')
 

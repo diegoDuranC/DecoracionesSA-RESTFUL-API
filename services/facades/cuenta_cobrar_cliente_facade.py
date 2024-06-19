@@ -24,7 +24,7 @@ class CuentaPorCobrarClienteFacade():
         vencimiento
         amortizacion
     '''
-
+ 
     def generar_plan_pago(self, cuenta_id, fecha_creacion, importe, intervalo_pago, vencimiento):
         '''
             Datos por instancia de plan de pagos:
@@ -56,31 +56,31 @@ class CuentaPorCobrarClienteFacade():
         if dias_hasta_vencimiento % intervalo_pago_dias != 0:
             amortizacion += 1
 
-        # Calcular el monto de cada pago
+        # Calcular el monto de cada pago, distribuyendo equitativamente
         monto_pago = importe / amortizacion
 
-        #LISTA DE PAGOS
+        # Lista de pagos
         plan_pagos = []
 
-        #FECHA DEL PRIMER PAGO A LA FECHA DE CREACION SE LE AUMENTA LA CANTIDAD DE DIAS PARA EL SIGUIENTE O EL INTERVALO
+        # Fecha del primer pago a la fecha de creacion se le aumenta la cantidad de dias para el siguiente o el intervalo
         fecha_pago = fecha_creacion_dt + timedelta(days=intervalo_pago_dias)
 
-        #GENERAR LOS PLANES DE PAGOS
-        for _ in range(amortizacion):
+        # Generar los planes de pagos
+        for i in range(amortizacion):
+            # Si es el último pago, ajustar la fecha de pago al vencimiento exacto
+            if i == amortizacion - 1:
+                fecha_pago = vencimiento_dt
+            
             plan_pago = PlanPagoCliente(
-                nro_cuenta = cuenta_id,
-                fecha = fecha_pago,
-                monto = monto_pago
+                nro_cuenta=cuenta_id,
+                fecha=fecha_pago,
+                monto=monto_pago
             )
             
             plan_pagos.append(plan_pago)
 
             # Calcular la fecha del próximo pago sumando el intervalo de pago
             fecha_pago += timedelta(days=intervalo_pago_dias)
-
-        # pago_schema = PlanPagoClienteSchema(many=True)
-
-        # print("Schema de Pagos \n",pago_schema.dump(plan_pagos))
 
         ultimo_pago_fecha = plan_pagos[-1].fecha
 
@@ -109,6 +109,8 @@ class CuentaPorCobrarClienteFacade():
         db.session.commit()
 
         if request_data:
+            #VENCIMIENTO ES LA FECHA TOPE PARA VENCER LA DEUDA
+            #SE ACEPTAN PAGOS QUINCENALES ES DECIR 2 VECES AL MES, O MENSUALES
             vencimiento = format_date(request_data.get('vencimiento'))
             nro_cuenta = cuenta.nro_cuenta
 
@@ -130,6 +132,9 @@ class CuentaPorCobrarClienteFacade():
 
         else:
             cuenta.vencimiento = factura.fecha
+
+            db.session.commit()
+            
             return cuenta_schema.dump(cuenta)
 
     def get_cuentas_cliente(self, id_cliente):
@@ -189,3 +194,29 @@ class CuentaPorCobrarClienteFacade():
             return {"Error" : "No hay cuenta"}
         
         return cuenta_schema.dump(cuenta)
+    
+    def eliminar_cuenta_pagos(self, nro_cuenta):
+        try:
+            # Se busca la cuenta por cobrar en la base de datos
+            cuenta_por_cobrar = CuentaPorCobrar.query.filter_by(nro_cuenta=nro_cuenta).first()
+
+            # Si la cuenta no se encuentra, se retorna False
+            if not cuenta_por_cobrar:
+                return {"error" : "La cuenta no existe"}
+
+            # Se eliminan todos los pagos asociados a la cuenta
+            for pago in cuenta_por_cobrar.pagos:
+                db.session.delete(pago)
+
+            # Se elimina la cuenta por cobrar
+            db.session.delete(cuenta_por_cobrar)
+
+            # Se confirma la eliminación en la base de datos
+            db.session.commit()
+
+            return {"mensaje" : "cuenta y pagos eliminados"}, 200
+        except Exception as e:
+            # Se revierte la transacción en caso de error
+            db.session.rollback()
+            raise e
+        

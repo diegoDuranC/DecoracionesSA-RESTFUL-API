@@ -14,6 +14,7 @@ class Cliente(db.Model):
     proyectos = db.relationship('Proyecto', back_populates='cliente')
     facturas = db.relationship('FacturaCliente', back_populates='cliente')
     cuentas_por_cobrar = db.relationship('CuentaPorCobrar', back_populates='cliente')
+    recibos = db.relationship('Recibo', back_populates='cliente')
 
     def __init__(self, cod_cliente, ci_cliente, nombre_cliente, apellido_cliente, direccion_cliente, telefono_cliente):
         self.cod_cliente = cod_cliente

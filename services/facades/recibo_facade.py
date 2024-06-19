@@ -43,15 +43,13 @@ class ReciboFacade():
         nro_proyecto = factura.proyecto_id
 
         proyecto = Proyecto.query.get(nro_proyecto)
-        cliente = Cliente.query.get(cuenta.id_cliente)
         
-        ci_cliente = cliente.ci_cliente
         monto = Decimal(request_data.get('monto'))
-        empleado_id = proyecto.encargado_proyecto
+        empleado_id = proyecto.encargado_proyecto_id
         
         #GENERAR EL RECIBO
         nuevo_recibo = Recibo(
-            ci_cliente = ci_cliente,
+            id_cliente = cuenta.id_cliente,
             monto = monto,
             cuenta_por_cobrar_id = nro_cuenta,
             empleado_id = empleado_id,
@@ -77,6 +75,9 @@ class ReciboFacade():
 
     def obtener_recibos(self):
         consulta = Recibo.query.all()
+
+        if not consulta: return {"mensaje" : "no hay recibos"}
+
         return self.recibo_schemas.dump(consulta)
 
     def obtener_recibos_por_fecha(self, fecha_inicio, fecha_fin):

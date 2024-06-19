@@ -4,51 +4,45 @@ from flask_cors import cross_origin
 from flask import jsonify, request, Blueprint
 
 from models.proyecto import Proyecto
-
 from services.facades.factura_cliente_facade import FacturaClienteFacade
-from models.cliente.factura_cliente import FacturaCliente, FacturaSchema
+
 
 factura_cliente_bp = Blueprint('factura_cliente', __name__)
 
-factura_schema = FacturaSchema()
-factura_schemas = FacturaSchema(many=True)
 factura_facade = FacturaClienteFacade()
+
 #CREAR LA FACTURA CLIENTE
 #SE NECESITA EL NUMERO DE PROYECTO PARA GENERAR LA FACTURA
-
-@factura_cliente_bp.route("/factura/crear_factura/<int:nro_proyecto>", methods=['GET'])
+@factura_cliente_bp.route("/factura_cliente/crear_factura/<int:nro_proyecto>", methods=['GET'])
 def crear_factura(nro_proyecto):
-    proyecto = Proyecto.query.get(nro_proyecto)
-    
-    if proyecto is None:
-        return jsonify({"Error": "No existe el proyecto"})
-    
     factura = factura_facade.crear_factura(nro_proyecto)
-    result = factura_schema.dump(factura)
 
-    return jsonify(result)
+    return jsonify(factura)
 
 #OBTENER FACTURAS
-
 @factura_cliente_bp.route("/facturas_cliente", methods=['GET'])
 def obtener_factura():
-
     facturas = factura_facade.get_facturas()
-    result = factura_schemas.dump(facturas)
 
-    return jsonify(result)
+    return jsonify(facturas)
 
 #OBTENER FACTURAS POR CLIENTE
+@factura_cliente_bp.route("/factura_cliente/cliente/<int:id_cliente>", methods=['GET'])
+def obtener_factura_cliente_id(id_cliente):
+    facturas = factura_facade.get_facturas_cliente_id(id_cliente)
 
-@factura_cliente_bp.route("/cliente/factura/<int:id_cliente>", methods=['GET'])
-def obtener_factura_cliente(id_cliente):
-    
-    factura = FacturaCliente.query.filter_by(cliente_id=id_cliente).first()
+    return jsonify(facturas)
 
-    if factura is None:
-        return jsonify({"Error": "El cliente no tiene facturas"})
+#OBTENER FACTURAS POR CI DEL CLIENTE
+@factura_cliente_bp.route("/factura_cliente/cliente/ci", methods=['GET'])
+def obtener_factura_cliente_ci():
+    ci = request.args.get('ci')
+    facturas = factura_facade.get_facturas_cliente_ci(ci)
 
-    facturas = factura_facade.get_facturas_cliente(id_cliente)
-    result = factura_schemas.dump(facturas)
+    return jsonify(facturas)
 
-    return jsonify(result)
+@factura_cliente_bp.route("/factura_cliente/<int:nro_factura>", methods=['DELETE'])
+def eliminar_factura(nro_factura):
+    factura = factura_facade.eliminar_factura(nro_factura)
+
+    return jsonify(factura)

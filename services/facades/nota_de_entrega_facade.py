@@ -83,8 +83,7 @@ class NotaDeEntregaFacade:
 
         db.session.add(orden)
         db.session.flush()
-
-
+        
 
     def agregar_nota_de_entrega(self, nro_orden, materiales_recibidos):
         try:

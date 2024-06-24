@@ -3,7 +3,7 @@ from sqlalchemy.exc import SQLAlchemyError
 from app import db
 from models.compras.factura_orden import FacturaOrdenCompra, FacturaOrdenCompraSchema
 from models.compras.orden_de_compra import OrdenDeCompra
-from models.proveedor import Proveedor
+from models.compras.proveedor import Proveedor
 from models.banco.deposito import Deposito
 
 class FacturaOrdenCompraFacade:

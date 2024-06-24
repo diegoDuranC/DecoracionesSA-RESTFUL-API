@@ -1,4 +1,4 @@
-from models.proveedor import ProveedorSchema
+from models.compras.proveedor import ProveedorSchema
 from flask import Blueprint, jsonify, request
 from controllers.proveedor_controller import ProveedorController
 from flask_cors import cross_origin

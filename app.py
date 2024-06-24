@@ -43,7 +43,6 @@ def create_app():
         app.register_blueprint(cargo_bp)
         app.register_blueprint(departamento_bp)
         app.register_blueprint(empleado_bp)
-
         app.register_blueprint(material_bp)
         app.register_blueprint(cliente_bp)
         app.register_blueprint(banco_bp)
@@ -84,7 +83,7 @@ def create_tables(app):
         from models.compras.material_recibido import MaterialRecibido
         
         # # models
-        from models.proveedor import Proveedor          
+        from models.compras.proveedor import Proveedor          
         from models.proyecto import Proyecto
 
         # # requisicion

@@ -1,4 +1,4 @@
-from models.proveedor import Proveedor
+from models.compras.proveedor import Proveedor
 from app import db
 from flask import request
 

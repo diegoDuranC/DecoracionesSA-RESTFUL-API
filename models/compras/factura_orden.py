@@ -1,7 +1,7 @@
 from app import db, ma
 from sqlalchemy import Column, Date, Numeric, Text, ForeignKey, Integer
 from marshmallow import fields
-from models.proveedor import ProveedorSchema
+from models.compras.proveedor import ProveedorSchema
 from models.compras.orden_de_compra import OrdenDeCompraSchema
 
 
